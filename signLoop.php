@@ -90,11 +90,9 @@ function sendLineMessage($line) {
         }
         
         if($STATIC_TEXT_PRE != "") {
-        	$line = $STATIC_TEXT_PRE." ";
+        	$line = $STATIC_TEXT_PRE." ".$line;
         		
         }
-        
-        $line .= $songTitle." - ".$songArtist;
         
         if($STATIC_TEXT_POST != "") {
         	$line .= " ".$STATIC_TEXT_POST;
