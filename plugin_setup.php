@@ -11,6 +11,7 @@ if(isset($_POST['submit']))
     $port= htmlspecialchars($_POST['port']);
     $loopMessage= htmlspecialchars($_POST['loopMessage']);
     $color= htmlspecialchars($_POST['color']);
+    $looptime = htmlspecialchars($_POST['looptime']);
 		//echo "Station Id set to: ".$name;
 
 		$betaBriteSettings = fopen($betaBriteSettingsFile, "w") or die("Unable to open file!");
@@ -22,6 +23,7 @@ if(isset($_POST['submit']))
 		$txt .= "PORT=".$port."\r\n";
 		$txt .= "LOOP_MESSAGE=".$loopMessage."\r\n";
 		$txt .= "COLOR=".$color."\r\n";
+		$txt .= "LOOPTIME=".$looptime."\r\n";
 		fwrite($betaBriteSettings, $txt);
 		fclose($betaBriteSettings);
 		$STATION_ID=$name;
@@ -72,6 +74,9 @@ if(isset($_POST['submit']))
 
 		$configParts=explode("=",$settingParts[6]);
                 $COLOR= $configParts[1];
+           $configParts=explode("=",$settingParts[7]);
+          $LOOPTIME= $configParts[1];
+                
 	}
 	fclose($file_handle);
 
@@ -85,6 +90,7 @@ if(isset($_POST['submit']))
                 echo "DEVICE CONNECTION TYPE: ".$DEVICE_CONNECTION_TYPE."<br/> \n";
                 echo "LOOP MESSAGE: ".$LOOPMESSAGE."<br/> \n";
                 echo "COLOR: ".$COLOR."<br/> \n";
+                echo "LOOP TIME: ".$LOOPTIME."<br/> \n";
                 }
 ?>
 
@@ -165,6 +171,12 @@ IP:
 
 PORT:
 <input type="text" value="<? if($PORT !="" ) { echo $PORT; } else { echo "";}?>" name="port" id="port"></input>
+
+<p/>
+
+LOOP time (in secs):
+<input type="text" value="<? if($LOOPTIME !="" ) { echo $LOOPTIME; } else { echo "10";}?>" name="looptime" id="looptime"></input>
+
 
 <p/>
 LOOP:
