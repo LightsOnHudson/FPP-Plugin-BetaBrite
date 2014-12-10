@@ -176,12 +176,12 @@ echo "<select name=\"loopMessage\"> \n";
 		switch ($LOOPMESSAGE) {
 
 			case "YES":
-				echo "<option selected value=\"".$loopMessage."\">".$loopMessage."</option> \n";
+				echo "<option selected value=\"".$LOOPMESSAGE."\">".$LOOPMESSAGE."</option> \n";
                 echo "<option value=\"NO\">NO</option> \n";
             	break;
 
 			case "NO":
-				echo "<option selected value=\"".$loopMessage."\">".$loopMessage."</option> \n";
+				echo "<option selected value=\"".$LOOPMESSAGE."\">".$LOOPMESSAGE."</option> \n";
                 echo "<option value=\"YES\">YES</option> \n";
                 break;
                 
