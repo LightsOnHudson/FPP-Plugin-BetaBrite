@@ -83,15 +83,12 @@ function logEntry($data) {
 function sendMessage($songTitle,$songArtist) {
 
 	global $betaBriteSettingsFile;
-
-//read in the configuration
-$file_handle = fopen($betaBriteSettingsFile, "r");
-	while (!feof($file_handle)) 
-	{
-   		$filedata = fgets($file_handle);
+	if (file_exists($betaBriteSettingsFile)) {
+		$filedata=file_get_contents($betaBriteSettingsFile);
+	} else {
+		logEntry("BetaBriteSettings File does not exist, configure plugin first");
+		exit(0);
 	}
-
-	$filedata=file_get_contents($betaBriteSettingsFile);
 	if($filedata !="" )
 	{
 		$settingParts = explode("\r",$filedata);
@@ -99,30 +96,27 @@ $file_handle = fopen($betaBriteSettingsFile, "r");
 		$STATION_ID = $configParts[1];
 		
 		$configParts=explode("=",$settingParts[1]);
-		$DEVICE = $configParts[1];
+		$DEVICE = "/dev/".$configParts[1];
 		
 		$configParts=explode("=",$settingParts[2]);
 		$DEVICE_CONNECTION_TYPE = $configParts[1];
 	
-                $configParts=explode("=",$settingParts[3]);
-                $RT_TEXT_PATH= $configParts[1];
-	
-		$configParts=explode("=",$settingParts[4]);
+		$configParts=explode("=",$settingParts[3]);
 		$IP = $configParts[1];
 	
-		$configParts=explode("=",$settingParts[5]);
+		$configParts=explode("=",$settingParts[4]);
 		$PORT = $configParts[1];
 
-                $configParts=explode("=",$settingParts[6]);
+                $configParts=explode("=",$settingParts[5]);
                 $LOOPMESSAGE = $configParts[1];
 
-                $configParts=explode("=",$settingParts[7]);
+                $configParts=explode("=",$settingParts[6]);
                 $cl_color= trim(strtolower($configParts[1]));
 	}
 	fclose($file_handle);
 
 	logEntry("reading config file");
-	logEntry("Station_ID: ".$STATION_ID." DEVICE: ".$DEVICE." DEVICE_CONNECTION_TYPE: ".$DEVICE_CONNECTION_TYPE." RT TEXT PATH: ".$RT_TEXT_PATH." IP: ".$IP. " PORT: ".$PORT." LOOPMESSAGE: ".$LOOPMESSAGE." Color: ".$cl_color);
+	logEntry("Station_ID: ".$STATION_ID." DEVICE: ".$DEVICE." DEVICE_CONNECTION_TYPE: ".$DEVICE_CONNECTION_TYPE." IP: ".$IP. " PORT: ".$PORT." LOOPMESSAGE: ".$LOOPMESSAGE." Color: ".$cl_color);
 
 
         if ( $cl_color== "" ) {
@@ -144,15 +138,7 @@ $file_handle = fopen($betaBriteSettingsFile, "r");
         }
 
 
-// Let's start the class
-//$serial = new phpSerial;
-
-//$serial->deviceSet($SERIAL_DEVICE);
-//$serial->deviceOpen();
-
-
-//# Send line to scroller
-//single_line_scroll($line, $scroller_color);
+$line = $songTitle." - ".$songArtist;
 
 switch ($DEVICE_CONNECTION_TYPE) {
 
@@ -174,22 +160,18 @@ switch ($DEVICE_CONNECTION_TYPE) {
 
 	case "SERIAL":
 
-
+		// Let's start the class
+		$serial = new phpSerial;
+		
+		$serial->deviceSet($DEVICE);
+		$serial->deviceOpen();
+		
+		
+		//# Send line to scroller
+		single_line_scroll($line, $scroller_color);
 		break;
 
-	case "PATH":
-
-		
-		$f = fopen($RT_TEXT_PATH."PS_TEXT.txt", "w"); 
-		fwrite($f, $STATION_ID); 
-		fclose($f);
-
-                $f = fopen($RT_TEXT_PATH."RT_TEXT.txt", "w");
-                fwrite($f, $songTitle." - ".$songArtist);
-                fclose($f);
-		
-		break;
-
+	
 	}	
 
 }

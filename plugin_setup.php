@@ -17,7 +17,7 @@ if(isset($_POST['submit']))
 		$txt = "STATION_ID=".$name."\r\n";
 		$txt .= "DEVICE=".$device."\r\n";
 		$txt .= "DEVICE_CONNECTION_TYPE=".$device_connection_type."\r\n";
-		$txt .= "RT_TEXT_PATH=".$rt_text_path."\r\n";
+
 		$txt .= "IP=".$ip."\r\n";
 		$txt .= "PORT=".$port."\r\n";
 		$txt .= "LOOP_MESSAGE=".$loopMessage."\r\n";
@@ -31,7 +31,7 @@ if(isset($_POST['submit']))
 		$PORT =$port;
 		$LOOPMESSAGE=$loopMessage;
 		$COLOR = $color;
-		$RT_TEXT_PATH= $rt_text_path;
+
 	//add the ability for GROWL to show changes upon submit :)
 	//	$.jGrowl("Station Id: $STATION_ID");	
         
@@ -44,13 +44,13 @@ if(isset($_POST['submit']))
 		echo "READING FILE: <br/> \n";
 	//try to read the settings file if available
 
-	$file_handle = fopen($betaBriteSettingsFile, "r");
-	while (!feof($file_handle)) 
-	{
-   		$filedata = fgets($file_handle);
-	}
 
-	$filedata=file_get_contents($betaBriteSettingsFile);
+	if (file_exists($betaBriteSettingsFile)) {
+		$filedata=file_get_contents($betaBriteSettingsFile);
+	} else {
+			logEntry("BetaBriteSettings File does not exist, configure plugin first");
+			exit(0);
+	}
 	if($filedata !="" )
 	{
 		$settingParts = explode("\r",$filedata);
@@ -63,19 +63,16 @@ if(isset($_POST['submit']))
 		$configParts=explode("=",$settingParts[2]);
 		$DEVICE_CONNECTION_TYPE = $configParts[1];
 	
-                $configParts=explode("=",$settingParts[3]);
-                $RT_TEXT_PATH= $configParts[1];
-	
-		$configParts=explode("=",$settingParts[4]);
+		$configParts=explode("=",$settingParts[3]);
 		$IP = $configParts[1];
 	
-		$configParts=explode("=",$settingParts[5]);
+		$configParts=explode("=",$settingParts[4]);
 		$PORT = $configParts[1];
 
-                $configParts=explode("=",$settingParts[6]);
+                $configParts=explode("=",$settingParts[5]);
                 $LOOPMESSAGE = $configParts[1];
 
-		$configParts=explode("=",$settingParts[7]);
+		$configParts=explode("=",$settingParts[6]);
                 $COLOR= $configParts[1];
 	}
 	fclose($file_handle);
@@ -84,7 +81,7 @@ if(isset($_POST['submit']))
         if($DEBUG) {
 		echo "STATION: ".$STATION_ID."<br/> \n";
 		echo "DEVICE: ".$DEVICE."<br/> \n";
-		echo "RT TEXT PATH: ".$RT_TEXT_PATH."<br/> \n";
+		
                 echo "IP: ".$IP."<br/> \n";
                 echo "PORT: ".$PORT."<br/> \n";
                 echo "DEVICE CONNECTION TYPE: ".$DEVICE_CONNECTION_TYPE."<br/> \n";
@@ -133,12 +130,7 @@ echo "<select name=\"device_connection_type\"> \n";
                                 		echo "<option value=\"PATH\">PATH</option> \n";
                         			break;
 			
-					 case "PATH":
-                                                echo "<option selected value=\"".$DEVICE_CONNECTION_TYPE."\">".$DEVICE_CONNECTION_TYPE."</option> \n";
-                                                echo "<option value=\"SERIAL\">SERIAL</option> \n";
-                                                echo "<option value=\"IP\">IP</option> \n";
-                                                break;
-                                
+				
 	
 				}
 	
@@ -151,11 +143,7 @@ echo "<select name=\"device_connection_type\"> \n";
         
 echo "</select> \n";
 echo "<p/> \n";
-?>
-RT TEXT PATH:
-<input type="text" value="<? if($RT_TEXT_PATH !="" ) { echo $RT_TEXT_PATH; } else { echo "";};?>" name="rt_text_path" size="64" id="rt_text_path"></input>
 
-<?
 echo "<p/> \n";
 echo "SERIAL DEVICE: \n";
 echo "<select name=\"device\"> \n";
