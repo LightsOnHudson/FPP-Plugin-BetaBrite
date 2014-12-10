@@ -47,10 +47,8 @@ if(isset($_POST['submit']))
 
 	if (file_exists($betaBriteSettingsFile)) {
 		$filedata=file_get_contents($betaBriteSettingsFile);
-	} else {
-			logEntry("BetaBriteSettings File does not exist, configure plugin first");
-			exit(0);
-	}
+	} 
+	
 	if($filedata !="" )
 	{
 		$settingParts = explode("\r",$filedata);
