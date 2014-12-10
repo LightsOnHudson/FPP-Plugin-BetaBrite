@@ -11,7 +11,7 @@ include 'php_serial.class.php';
 $logFile = "/home/pi/media/logs/betabrite.log";
 
 $callbackRegisters = "media\n";
-var_dump($argv);
+//var_dump($argv);
 switch ($argv[1])
 	{
 		case "--list":
