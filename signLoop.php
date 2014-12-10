@@ -81,11 +81,28 @@ function sendLineMessage($line) {
 				
                 $configParts=explode("=",$settingParts[7]);
                 $LOOPTIME= trim(strtolower($configParts[1]));
+
+                $configParts=explode("=",$settingParts[8]);
+                $STATIC_TEXT_PRE= trim($configParts[1]);
+                
+                $configParts=explode("=",$settingParts[9]);
+                $STATIC_TEXT_POST= trim($configParts[1]);
+        }
+        
+        if($STATIC_TEXT_PRE != "") {
+        	$line = $STATIC_TEXT_PRE." ";
+        		
+        }
+        
+        $line .= $songTitle." - ".$songArtist;
+        
+        if($STATIC_TEXT_POST != "") {
+        	$line .= " ".$STATIC_TEXT_POST;
         }
 
         logEntry("reading config file");
-        logEntry("Station_ID: ".$STATION_ID." DEVICE: ".$DEVICE." DEVICE_CONNECTION_TYPE: ".$DEVICE_CONNECTION_TYPE." IP: ".$IP. " PORT: ".$PORT." LOOPMESSAGE: ".$LOOPMESSAGE." LOOP TIME: ".$LOOPTIME."  Color: ".$cl_color);
-                
+        logEntry("Station_ID: ".$STATION_ID." DEVICE: ".$DEVICE." DEVICE_CONNECTION_TYPE: ".$DEVICE_CONNECTION_TYPE." IP: ".$IP. " PORT: ".$PORT." LOOPMESSAGE: ".$LOOPMESSAGE." STATIC TEXT PRE: ".$STATIC_TEXT_PRE. " STATIC TEXT POST: ".$STATIC_TEXT_POST." LOOP TIME: ".$LOOPTIME."  Color: ".$cl_color);
+                          
 
         if ( $cl_color== "" ) {
                 $scroller_color="$default_color";

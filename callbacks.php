@@ -139,16 +139,7 @@ function sendLineMessage($songTitle,$songArtist) {
 
 	logEntry("Sending Message to sign Looper: LOOP: ".$LOOPMESSAGE);
 	
-	if($STATIC_TEXT_PRE != "") {
-			$line = $STATIC_TEXT_PRE." ";
-			
-	}
 
-	$line .= $songTitle." - ".$songArtist;
-
-	if($STATIC_TEXT_POST != "") {
-		$line .= " ".$STATIC_TEXT_POST;
-	}
 			$cmd = "/usr/bin/killall -9 signLoop.php";
 			system($cmd,$output);
 	switch ($LOOPMESSAGE) {
