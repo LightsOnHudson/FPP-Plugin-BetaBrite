@@ -2,16 +2,16 @@
 <?
 error_reporting(0);
 include 'config/config.inc';
-include 'config/functions.inc';
+
 $betaBriteSettingsFile = "/home/pi/media/plugins/betabrite.settings";
-include 'config/php_serial.class.php';
+include 'php_serial.class.php';
 //arg0 is  the program
 //arg1 is the first argument in the registration this will be --list
 //$DEBUG=true;
 $logFile = "/home/pi/media/logs/betabrite.log";
 
 $callbackRegisters = "media\n";
-
+var_dump($argv);
 switch ($argv[1])
 	{
 		case "--list":
