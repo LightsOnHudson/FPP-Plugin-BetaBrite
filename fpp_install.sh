@@ -1,8 +1,7 @@
 #!/bin/bash
-
+cd /tmp
 /bin/mkdir /opt/fpp/plugins/BetaBrite
-cd /opt/fpp/plugins/BetaBrite/
 /usr/bin/wget http://50.194.140.209/fpp/plugins/BetaBrite/BetaBrite.zip
-/usr/bin/unzip BetaBrite.zip
-rm BetaBrite.zip
-/usr/bin/chmod +x /opt/fpp/plugins/BetaBrite/callbacks.php
+/usr/bin/unzip BetaBrite.zip -d /opt/fpp/plugins/BetaBrite
+/bin/rm /tmp/BetaBrite.zip
+/bin/chmod +x /opt/fpp/plugins/BetaBrite/callbacks.php
