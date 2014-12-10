@@ -172,22 +172,24 @@ PORT:
 LOOP:
 <?
 echo "<select name=\"loopMessage\"> \n";
-                        if($loopMessage == "YES")
-                        {
-                                echo "<option selected value=\"".$loopMessage."\">".$loopMessage."</option> \n";
-                                echo "<option value=\"NO\">NO</option> \n";
-                        } 
-			if($loopMessage == "NO") 
-			{
-                                echo "<option selected value=\"".$loopMessage."\">".$loopMessage."</option> \n";
-                                echo "<option value=\"YES\">YES</option> \n";
-                        }
-			if($loopMessage == "") 
-			{
 
-                                echo "<option value=\"NO\">NO</option> \n";
-                                echo "<option value=\"YES\">YES</option> \n";
-			}
+		switch ($LOOPMESSAGE) {
+
+			case "YES":
+				echo "<option selected value=\"".$loopMessage."\">".$loopMessage."</option> \n";
+                echo "<option value=\"NO\">NO</option> \n";
+            	break;
+
+			case "NO":
+				echo "<option selected value=\"".$loopMessage."\">".$loopMessage."</option> \n";
+                echo "<option value=\"YES\">YES</option> \n";
+                break;
+                
+			default:
+                  echo "<option value=\"NO\">NO</option> \n";
+                  echo "<option value=\"YES\">YES</option> \n";
+				break;
+				}
                 
         
 echo "</select> \n";
@@ -195,6 +197,8 @@ echo "</select> \n";
 <p/>
 COLOR:
 <?
+
+//create an array of color here
 echo "<select name=\"color\"> \n";
                       echo "<option value=\"YELLOW\">YELLOW</option> \n";
                       echo "<option value=\"GREEN\">GREEN</option> \n";
