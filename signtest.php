@@ -1,75 +1,13 @@
 #!/usr/bin/php
 <?
-error_reporting(0);
 include 'config.inc';
 
-$betaBriteSettingsFile = "/home/pi/media/plugins/betabrite.settings";
-include 'php_serial.class.php';
-//arg0 is  the program
-//arg1 is the first argument in the registration this will be --list
-//$DEBUG=true;
 $logFile = "/home/pi/media/logs/betabrite.log";
 
-$callbackRegisters = "media\n";
-//var_dump($argv);
-switch ($argv[1])
-	{
-		case "--list":
-			echo $callbackRegisters;
-			logEntry("FPPD List Registration request: responded:". $callbackRegisters);
-			exit(0);
 
-		case "--type":
-			//we got a register request message from the daemon
-			processCallback($argv);	
-			break;
+logEntry("sending data to sign");
 
-		default:
-			logEntry($argv[0]." called with no parameteres");
-			break;	
-	}
-exit(0);
-
-function processCallback($argv) {
-
-	global $DEBUG;
-
-	if($DEBUG)
-		print_r($argv);
-	//argv0 = program
-		
-	//argv2 should equal our registration // need to process all the rgistrations we may have, array??
-	//argv3 should be --data
-	//argv4 should be json data
-
-	$registrationType = $argv[2];
-	$data =  $argv[4];
-
-	logEntry($registrationType . " registration requestion from FPPD daemon");
-
-	switch ($registrationType) 
-	{
-		case "media":
-			if($argv[3] == "--data")
-			{
-				$data=trim($data);
-				logEntry("DATA: ".$data);
-				$obj = json_decode($data);
-				$songTitle = $obj->{'title'};
-				$songArtist = $obj->{'artist'};
-				if($songArtist != "") {
-					logEntry("Song Title: ".$songTitle." Artist: ".$songArtist);
-					sendMessage($songTitle,$songArtist);
-					} else {
-					logEntry("No Song title or artist: was this an event type maybe");
-					exit(0);
-					}
-			}	
-		break;
-
-	}
-
-}
+sendMessage("song title","song artist");
 
 function logEntry($data) {
 
@@ -116,6 +54,7 @@ function sendMessage($songTitle,$songArtist) {
                 $configParts=explode("=",$settingParts[6]);
                 $cl_color= trim(strtolower($configParts[1]));
 	}
+	fclose($file_handle);
 
 	logEntry("reading config file");
 	logEntry("Station_ID: ".$STATION_ID." DEVICE: ".$DEVICE." DEVICE_CONNECTION_TYPE: ".$DEVICE_CONNECTION_TYPE." IP: ".$IP. " PORT: ".$PORT." LOOPMESSAGE: ".$LOOPMESSAGE." Color: ".$cl_color);
@@ -172,9 +111,8 @@ switch ($DEVICE_CONNECTION_TYPE) {
 
 function ip_single_line_scroll ($fs, $combined, $scroller_color){
 
+	include 'config/config.inc';
 	// Let's start the class
-	global $betaBriteSettingsFile;
-	include 'config.inc';
 
 	//      # =-=-= Start of character counting =-=-=
 	//      # Added to the end of the message will be blank characters representing the length
@@ -229,15 +167,10 @@ function ip_single_line_scroll ($fs, $combined, $scroller_color){
 function single_line_scroll ($combined, $scroller_color,$DEVICE){
 
 	
-	global $betaBriteSettingsFile;
-	include 'config.inc';
 	// Let's start the class
 	$serial = new phpSerial;
 	$serial->deviceSet($DEVICE);
 	$serial->deviceOpen();
-
-	logEntry("sending ".$combined." out ".$DEVICE);
-
 	//      # =-=-= Start of character counting =-=-=
 	//      # Added to the end of the message will be blank characters representing the length
 	//      # of the display. This is so we can calculate how long it will take the message

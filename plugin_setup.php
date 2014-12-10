@@ -120,12 +120,10 @@ echo "<select name=\"device_connection_type\"> \n";
 					case "SERIAL":
                                 		echo "<option selected value=\"".$DEVICE_CONNECTION_TYPE."\">".$DEVICE_CONNECTION_TYPE."</option> \n";
                                 		echo "<option value=\"IP\">IP</option> \n";
-                                		echo "<option value=\"PATH\">PATH</option> \n";
                                 		break;
 					case "IP":
                                 		echo "<option selected value=\"".$DEVICE_CONNECTION_TYPE."\">".$DEVICE_CONNECTION_TYPE."</option> \n";
                                 		echo "<option value=\"SERIAL\">SERIAL</option> \n";
-                                		echo "<option value=\"PATH\">PATH</option> \n";
                         			break;
 			
 				
