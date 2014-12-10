@@ -28,7 +28,8 @@ switch ($argv[1])
 			logEntry($argv[0]." called with no parameteres");
 			break;	
 	}
-exit(0);
+
+
 
 function processCallback($argv) {
 
@@ -59,7 +60,7 @@ function processCallback($argv) {
 				$songArtist = $obj->{'artist'};
 				if($songArtist != "") {
 					logEntry("Song Title: ".$songTitle." Artist: ".$songArtist);
-					sendMessage($songTitle,$songArtist);
+					sendLineMessage($songTitle,$songArtist);
 					} else {
 					logEntry("No Song title or artist: was this an event type maybe");
 					exit(0);
@@ -83,7 +84,7 @@ function logEntry($data) {
 
 //function send the message
 
-function sendMessage($songTitle,$songArtist) {
+function sendLineMessage($songTitle,$songArtist) {
 
 	global $betaBriteSettingsFile,$default_color,$errno, $errstr, $cfgTimeOut;
 	if (file_exists($betaBriteSettingsFile)) {
@@ -176,6 +177,7 @@ function ip_single_line_scroll ($fs, $combined, $scroller_color){
 	global $betaBriteSettingsFile;
 	include 'config.inc';
 
+	logEntry("sending via IP");
 	//      # =-=-= Start of character counting =-=-=
 	//      # Added to the end of the message will be blank characters representing the length
 	//      # of the display. This is so we can calculate how long it will take the message
