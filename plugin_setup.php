@@ -12,18 +12,22 @@ if(isset($_POST['submit']))
     $loopMessage= htmlspecialchars($_POST['loopMessage']);
     $color= htmlspecialchars($_POST['color']);
     $looptime = htmlspecialchars($_POST['looptime']);
+    $static_text_pre = htmlspecialchars($_POST['static_text_pre']);
+    $static_text_post = htmlspecialchars($_POST['static_text_post']);
 		//echo "Station Id set to: ".$name;
 
 		$betaBriteSettings = fopen($betaBriteSettingsFile, "w") or die("Unable to open file!");
-		$txt = "STATION_ID=".$name."\r\n";
+		$txt = "STATION_ID=".trim($name)."\r\n";
 		$txt .= "DEVICE=".$device."\r\n";
 		$txt .= "DEVICE_CONNECTION_TYPE=".$device_connection_type."\r\n";
 
-		$txt .= "IP=".$ip."\r\n";
-		$txt .= "PORT=".$port."\r\n";
+		$txt .= "IP=".trim($ip)."\r\n";
+		$txt .= "PORT=".trim($port)."\r\n";
 		$txt .= "LOOP_MESSAGE=".$loopMessage."\r\n";
 		$txt .= "COLOR=".$color."\r\n";
-		$txt .= "LOOPTIME=".$looptime."\r\n";
+		$txt .= "LOOPTIME=".trim($looptime)."\r\n";
+		$txt .= "STATIC_TEXT_PRE=".trim($static_text_pre)."\r\n";
+		$txt .= "STATIC_TEXT_POST=".trim($static_text_post)."\r\n";
 		fwrite($betaBriteSettings, $txt);
 		fclose($betaBriteSettings);
 		$STATION_ID=$name;
@@ -33,6 +37,8 @@ if(isset($_POST['submit']))
 		$PORT =$port;
 		$LOOPMESSAGE=$loopMessage;
 		$COLOR = $color;
+		$STATIC_TEXT_PRE=$static_text_pre;
+		$STATIC_TEXT_POST=$static_text_post;
 
 	//add the ability for GROWL to show changes upon submit :)
 	//	$.jGrowl("Station Id: $STATION_ID");	
@@ -76,6 +82,12 @@ if(isset($_POST['submit']))
                 $COLOR= $configParts[1];
            $configParts=explode("=",$settingParts[7]);
           $LOOPTIME= $configParts[1];
+
+          $configParts=explode("=",$settingParts[8]);
+          $STATIC_TEXT_PRE = $configParts[1];
+          
+          $configParts=explode("=",$settingParts[9]);
+          $STATIC_TEXT_POST = $configParts[1];
                 
 	}
 	fclose($file_handle);
@@ -91,6 +103,8 @@ if(isset($_POST['submit']))
                 echo "LOOP MESSAGE: ".$LOOPMESSAGE."<br/> \n";
                 echo "COLOR: ".$COLOR."<br/> \n";
                 echo "LOOP TIME: ".$LOOPTIME."<br/> \n";
+                echo "STATIC TEXT PRE: ".$STATIC_TEXT_PRE."<br/> \n";
+                echo "STATIC TEXT POST: ".$STATIC_TEXT_POST."<br/> \n";
                 }
 ?>
 
@@ -105,6 +119,11 @@ if(isset($_POST['submit']))
 <p>Known Issues:
 <ul>
 <li>NONE</li>
+</ul>
+
+<p>Configuration:
+<ul>
+<li>Configure your connection type, IP, Serial, Static text you want to send in front of Artist and song and post text, loop time if you want looping and color</li>
 </ul>
 
 <form method="post" action="http://<? echo $_SERVER['SERVER_NAME']?>/plugin.php?plugin=BetaBrite&page=plugin_setup.php">
@@ -171,6 +190,17 @@ IP:
 
 PORT:
 <input type="text" value="<? if($PORT !="" ) { echo $PORT; } else { echo "";}?>" name="port" id="port"></input>
+
+<p/>
+
+STATIC TEXT PRE:
+<input type="text" value="<? if($STATIC_TEXT_PRE !="" ) { echo $STATIC_TEXT_PRE; } else { echo "";}?>" name="static_text_pre" id="static_text_pre"></input>
+
+
+<p/>
+
+STATIC TEXT POST:
+<input type="text" value="<? if($STATIC_TEXT_POST !="" ) { echo $STATIC_TEXT_POST; } else { echo "";}?>" name="static_text_post" id="static_text_post"></input>
 
 <p/>
 
