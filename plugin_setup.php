@@ -194,13 +194,13 @@ PORT:
 <p/>
 
 STATIC TEXT PRE:
-<input type="text" value="<? if($STATIC_TEXT_PRE !="" ) { echo $STATIC_TEXT_PRE; } else { echo "";}?>" name="static_text_pre" id="static_text_pre"></input>
+<input type="text" size="64" value="<? if($STATIC_TEXT_PRE !="" ) { echo $STATIC_TEXT_PRE; } else { echo "";}?>" name="static_text_pre" id="static_text_pre"></input>
 
 
 <p/>
 
 STATIC TEXT POST:
-<input type="text" value="<? if($STATIC_TEXT_POST !="" ) { echo $STATIC_TEXT_POST; } else { echo "";}?>" name="static_text_post" id="static_text_post"></input>
+<input type="text" size="64" value="<? if($STATIC_TEXT_POST !="" ) { echo $STATIC_TEXT_POST; } else { echo "";}?>" name="static_text_post" id="static_text_post"></input>
 
 <p/>
 
