@@ -173,15 +173,10 @@ do {
 		logEntry("INSIDE SERIAL");	
 		//# Send line to scroller
 		$cmd = "/opt/fpp/plugins/BetaBrite/alphasign ";
-<<<<<<< HEAD
-=======
-		logEntry("SERIAL CMD: ".$cmd);
->>>>>>> FETCH_HEAD
 		$cmd .= "\"".$line."\"";
 		$cmd .= " ".$DEVICE;
 		logEntry("SERIAL CMD: ".$cmd);
 		system($cmd,$output);
-<<<<<<< HEAD
 
 		//blank the line
 		sleep(10);
@@ -190,10 +185,8 @@ do {
                 $cmd .= " ".$DEVICE;
                 logEntry("SERIAL CMD: ".$cmd);
                 system($cmd,$output);	
-=======
 	//	sleep(1);
 	//	single_line_scroll($line, $scroller_color,$DEVICE);
->>>>>>> FETCH_HEAD
 		break;
 
 	
