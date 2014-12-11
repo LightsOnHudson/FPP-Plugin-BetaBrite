@@ -140,6 +140,8 @@ function sendLineMessage($songTitle,$songArtist) {
 	logEntry("Sending Message to sign Looper: LOOP: ".$LOOPMESSAGE);
 	
 	$line = $songTitle. " - ".$songArtist;
+
+	logEntry("LINE: ".$line);
 			$cmd = "/usr/bin/killall -9 signLoop.php";
 			system($cmd,$output);
 	switch ($LOOPMESSAGE) {

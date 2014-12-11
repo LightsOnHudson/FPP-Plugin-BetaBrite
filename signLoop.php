@@ -46,7 +46,6 @@ function logEntry($data) {
 
 function sendLineMessage($line) {
 
-	logEntry("SENDING: ".$line);
 
 	global $betaBriteSettingsFile,$default_color,$errno, $errstr, $cfgTimeOut;
 	if (file_exists($betaBriteSettingsFile)) {
@@ -90,13 +89,16 @@ function sendLineMessage($line) {
         }
         
         if($STATIC_TEXT_PRE != "") {
-        	$line = $STATIC_TEXT_PRE." ".$line;
+        	$newLine = $STATIC_TEXT_PRE." ".$line;
         		
         }
+	$line = $newLine;
         
         if($STATIC_TEXT_POST != "") {
         	$line .= " ".$STATIC_TEXT_POST;
         }
+
+	logEntry("SNDING: ".$line);
 
         logEntry("reading config file");
         logEntry("Station_ID: ".$STATION_ID." DEVICE: ".$DEVICE." DEVICE_CONNECTION_TYPE: ".$DEVICE_CONNECTION_TYPE." IP: ".$IP. " PORT: ".$PORT." LOOPMESSAGE: ".$LOOPMESSAGE." STATIC TEXT PRE: ".$STATIC_TEXT_PRE. " STATIC TEXT POST: ".$STATIC_TEXT_POST." LOOP TIME: ".$LOOPTIME."  Color: ".$cl_color);
