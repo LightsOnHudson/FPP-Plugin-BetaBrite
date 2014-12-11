@@ -12,6 +12,19 @@ $logFile = "/home/pi/media/logs/betabrite.log";
 
 $callbackRegisters = "media\n";
 //var_dump($argv);
+$lockFile = "/home/pi/media/plugins/betabrite.lock";
+
+
+$myProcessId = getmypid();
+
+if (file_exists($lockFile)) {
+                $filedata=file_get_contents($lockFile);
+                logEntry("Lock File Exists");
+                exit(0);
+        }
+
+logEntry("RUNNING PD: ".$myProcessId);
+
 switch ($argv[1])
 	{
 		case "--list":
@@ -61,15 +74,27 @@ function processCallback($argv) {
 				$data=trim($data);
 				logEntry("DATA: ".$data);
 				$obj = json_decode($data);
+
+				$type = $obj->{'type'};
+				if($type == "event" || $type == "pause") {
+					//let's reset the callbacks / sign script
+					$cmd = "/usr/bin/killall -9 signLoop.php";
+					system($cmd,$output);
+
+					sleep(1);
+					$cmd = "/usr/bin/killall -9 callbacks.php";
+					system($cmd,$output);
+					logEntry("Resetting to due to event/pause");
+					exit(0);
+				}
+
 				$songTitle = $obj->{'title'};
 				$songArtist = $obj->{'artist'};
 				if($songArtist != "") {
 					logEntry("Song Title: ".$songTitle." Artist: ".$songArtist);
 					sendLineMessage($songTitle,$songArtist);
-					} else {
-					logEntry("No Song title or artist: was this an event type maybe");
 					exit(0);
-					}
+					} 
 			}	
 		break;
 
