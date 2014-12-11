@@ -11,11 +11,22 @@ include 'php_serial.class.php';
 $logFile = "/home/pi/media/logs/betabrite.log";
 
 //var_dump($argv);
-processCallback($argv);	
+
 logEntry("INCOMOING LOOP ARGUMENTs: ".$argv);
 logEntry("arg0:".$argv[0]);
 logEntry("arg1: ".$argv[1]);
+logEntry("arg2: ".$argv[2]);
 
+//kill the master call back process from arg1
+$cmdKill = "/bin/kill -9 ".$argv[1];
+logEntry("killing master callbacks process now that i'm here: ".$cmdKill);
+
+exec($cmdKill,$output);
+//sleep(1);
+
+processCallback($argv);
+
+//kill off arg1 pid
 function processCallback($argv) {
 
 	global $DEBUG;
@@ -25,8 +36,16 @@ function processCallback($argv) {
 	//argv0 = program
 		
 	//argv1 should be text to scroll
-	$data =  $argv[1];
+	$data =  $argv[2];
+	if(trim($data) == "") {
+		logEntry("No data sent to sign looper: exit");
+		
+		exit(0);
+	}
 	sendLineMessage($data);
+	
+
+	
 	exit(0);
 	
 }
@@ -79,7 +98,7 @@ function sendLineMessage($line) {
                 $cl_color= trim(strtolower($configParts[1]));
 				
                 $configParts=explode("=",$settingParts[7]);
-                $LOOPTIME= trim(strtolower($configParts[1]));
+                $LOOPTIME= trim($configParts[1]);
 
                 $configParts=explode("=",$settingParts[8]);
                 $STATIC_TEXT_PRE= trim($configParts[1]);
@@ -90,9 +109,9 @@ function sendLineMessage($line) {
         
         if($STATIC_TEXT_PRE != "") {
         	$newLine = $STATIC_TEXT_PRE." ".$line;
+        	$line = $newLine;
         		
         }
-	$line = $newLine;
         
         if($STATIC_TEXT_POST != "") {
         	$line .= " ".$STATIC_TEXT_POST;
@@ -122,10 +141,13 @@ function sendLineMessage($line) {
                 elseif ( $cl_color == "auto" ) { $scroller_color="\x1c\x43"; }
         }
 
-
-switch ($DEVICE_CONNECTION_TYPE) {
+do {
+	logEntry("LOOP MESSAGE: ".$LOOPMESSAGE);
+	
+	switch ($DEVICE_CONNECTION_TYPE) {
 
 	case "IP":
+
 		$fs = fsockopen($IP, $PORT, $errno, $errstr, $cfgTimeOut);
 		if(!$fs) {
 			logEntry( "Error connecting to sign");
@@ -133,12 +155,14 @@ switch ($DEVICE_CONNECTION_TYPE) {
 		}
 
 		$delay = ip_single_line_scroll($fs, $line, $scroller_color);
-		sleep($delay);
+	//	sleep($delay);
 		//send a blank line to clear out last message
-		$line = "";
-		ip_single_line_scroll($fs, $line, $scroller_color);
+	//	$line = "";
+	//	ip_single_line_scroll($fs, $line, $scroller_color);
 		fclose($fs);
 
+	
+		
 		break;
 
 	case "SERIAL":
@@ -148,6 +172,13 @@ switch ($DEVICE_CONNECTION_TYPE) {
 
 	
 	}	
+	
+	if($LOOPMESSAGE=="YES") {
+		logEntry("LOOP SLEEP: ".$LOOPTIME);
+		sleep($LOOPTIME);
+	}
+	
+	} while($LOOPMESSAGE=="YES");
 
 }
 

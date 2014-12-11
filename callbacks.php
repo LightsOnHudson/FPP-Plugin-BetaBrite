@@ -12,19 +12,35 @@ $logFile = "/home/pi/media/logs/betabrite.log";
 
 $callbackRegisters = "media\n";
 //var_dump($argv);
-$lockFile = "/home/pi/media/plugins/betabrite.lock";
-
+$lockFile = "/home/pi/media/plugins/betabrite.loop";
 
 $myProcessId = getmypid();
+
+function doLockFile() {
+
+	global $lockFile,$myProcessId;
 
 if (file_exists($lockFile)) {
                 $filedata=file_get_contents($lockFile);
                 logEntry("Lock File Exists");
-                exit(0);
-        }
 
-logEntry("RUNNING PD: ".$myProcessId);
+		//read the lock file for the PID to kill
+			$filedata=file_get_contents($lockFile);
+	
+		if($filedata !="" )
+		{
+			logEntry("Running lock file in pid: ".$filedata);
+		}
 
+ } else {
+
+	logEntry("RUNNING PD: ".$myProcessId);
+	$lockFileStatus= fopen($lockFile, "w") or die("Unable to open file!");
+		fwrite($lockFileStatus, $myProcessId);
+		fclose($lockFileStatus);
+
+}
+}
 switch ($argv[1])
 	{
 		case "--list":
@@ -47,9 +63,6 @@ function escapeshellarg_special($file) {
 }
 
 function processCallback($argv) {
-
-        $cmd = "/usr/bin/killall -9 signLoop.php";
-        system($cmd,$output);
 
 	global $DEBUG;
 
@@ -78,12 +91,15 @@ function processCallback($argv) {
 				$type = $obj->{'type'};
 				if($type == "event" || $type == "pause") {
 					//let's reset the callbacks / sign script
-					$cmd = "/usr/bin/killall -9 signLoop.php";
-					system($cmd,$output);
+				//	$cmd = "/usr/bin/killall -9 signLoop.php";
+				//	system($cmd,$output);
 
-					sleep(1);
-					$cmd = "/usr/bin/killall -9 callbacks.php";
-					system($cmd,$output);
+				//	sleep(1);
+				//	$cmd = "/usr/bin/killall -9 callbacks.php";
+				//	system($cmd,$output);
+		//			$cmd = "/bin/rm /home/pi/media/plugins/betabrite.lock";
+		//			system($cmd,$output);
+
 					logEntry("Resetting to due to event/pause");
 					exit(0);
 				}
@@ -163,33 +179,62 @@ function sendLineMessage($songTitle,$songArtist) {
 
 
 	logEntry("Sending Message to sign Looper: LOOP: ".$LOOPMESSAGE);
-	
+	$myPid = getmypid();
+	logEntry("My pid? :".$myPid);
 	$line = $songTitle. " - ".$songArtist;
+			//findCommandPID("/opt/fpp/plugins/BetaBrite/callbacks.php");
+			
+	//kill all signLoop processes running to reset them
+	killSignLoopProcesses();
+	sleep(1);
 
-	logEntry("LINE: ".$line);
-			$cmd = "/usr/bin/killall -9 signLoop.php";
-			system($cmd,$output);
-	switch ($LOOPMESSAGE) {
+			$cmd = "/usr/bin/php /opt/fpp/plugins/BetaBrite/signLoop.php ".$myPid." ".escapeshellarg_special($line);
+			
+            exec($cmd,$output);	
+	
+//	logEntry("I'm HERE");
+           // findCommandPID("signLoop.php");
+         //   sleep(2);
+           // logEntry("PID: ".findCommandPID("/opt/fpp/plugins/BetaBrite/signLoop.php"));
+		//	exit(0);
+			
+}
 
-
-		case "YES":
-
-			sleep(1);
-			do {
-				$cmd = "/usr/bin/php /opt/fpp/plugins/BetaBrite/signLoop.php ".escapeshellarg_special($line);
-				system($cmd,$output);
-				sleep($LOOPTIME);
-			} while ($LOOPMESSAGE=="YES");
-			break;
-
-
-		case "NO":
-			//send once
-			$cmd = "/usr/bin/php /opt/fpp/plugins/BetaBrite/signLoop.php ".escapeshellarg_special($line);
-                        system($cmd,$output);	
-			break;
-
-
+function killSignLoopProcesses() {
+	
+	$cmdKill = "/bin/ps aux | grep -i signLoop.php";
+	exec($cmdKill,$output);
+	
+	for($i=0;$i<=count($output);$i++) {
+		
+		logEntry("signLoop process found:".$output[$i]);
+		
+		$processPieces =preg_split('/[\s]+/', $output[$i]);
+		
+		$processId = $processPieces[1];
+		logEntry("Kill id: ".$processId);
+		
+		$killProcessCmd = "kill ".$processId;
+		exec($killProcessCmd);//($killProcessCmd,$output);
+		
+		
 	}
 }
+function findCommandPID($command)
+{
+	logEntry("looking for pid");
+	
+	$cmdPS = "/bin/ps aux | grep -i '".$command."'";
+	logEntry("pid command: ".$cmdPS);
+	
+	exec($cmdPS,$output);
+	for($i=0;$i<=count($output);$i++) {
+		logEntry($output[$i]);
+		
+	}
+	
+	//the first one should be our command - remember it and kill itself off
+	
+	
+			}
 ?>
