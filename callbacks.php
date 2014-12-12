@@ -167,13 +167,25 @@ function sendLineMessage($songTitle,$songArtist) {
         
 
 
-        logEntry("reading config file");
+     //   logEntry("reading config file");
         logEntry("Station_ID: ".$STATION_ID." DEVICE: ".$DEVICE." DEVICE_CONNECTION_TYPE: ".$DEVICE_CONNECTION_TYPE." IP: ".$IP. " PORT: ".$PORT." LOOPMESSAGE: ".$LOOPMESSAGE." STATIC TEXT PRE: ".$STATIC_TEXT_PRE. " STATIC TEXT POST: ".$STATIC_TEXT_POST." LOOP TIME: ".$LOOPTIME."  Color: ".$cl_color);
 
 
 	logEntry("Sending Message to sign Looper: LOOP: ".$LOOPMESSAGE);
 	
 	$line = $songTitle. " - ".$songArtist;
+	
+	//add pre and post text if they are here
+	
+	if($STATIC_TEXT_PRE != "") {
+		$newLine = $STATIC_TEXT_PRE." ".$line;
+		$line = $newLine;
+	}
+	
+	if($STATIC_TEXT_POST != "") {
+		$line .= " ".$STATIC_TEXT_POST;
+	}
+
 	
 	logEntry("INSIDE SEND");
 	//# Send line to scroller
