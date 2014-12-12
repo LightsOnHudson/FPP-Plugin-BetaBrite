@@ -1,6 +1,6 @@
 <?php
 //$DEBUG=true;
-$betaBriteSettingsFile = "/home/pi/media/plugins/betabrite.settings";
+$miniRDSSettingsFile = $settings['mediaDirectory']."/config/plugin.betabrite";
 if(isset($_POST['submit']))
 {
     $name = htmlspecialchars($_POST['station']);
