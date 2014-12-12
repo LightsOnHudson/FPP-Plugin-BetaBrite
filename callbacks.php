@@ -2,14 +2,13 @@
 <?
 error_reporting(0);
 
-//include '/opt/fpp/www/config.php';
+$skipJSsettings = 1;
+include_once '/opt/fpp/www/config.php';
 //include_once("/opt/fpp/www/common.php");
 
 //include_once("config.inc"); //'config.inc';
 
-$settings=array();
-$settings['mediaDirectory'] = "/home/pi/media";
-$settings['logDirectory'] = "/home/pi/media/logs";
+
 
 //include_once("signControl.inc");
 
