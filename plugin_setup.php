@@ -1,6 +1,19 @@
 <?php
 //$DEBUG=true;
 $betaBriteSettingsFile = $settings['mediaDirectory']."/config/plugin.betabrite";
+$betaBriteSequencePATH  = $settings['sequenceDirectory'];
+
+createBetaBriteSequenceFiles();
+
+//create sequence files
+function createBetaBriteSequenceFiles() {
+	global $betaBriteSequencePATH;
+	$betaBriteSequenceFileClear = $betaBriteSequencePATH."/"."BETABRITE-CLEAR.FSEQ";
+	
+	$tmpFile = fopen($betaBriteSequenceFileClear, "w") or die("Unable to open file BetaBrite Settings File!");
+	fclose($tmpFile);
+	
+}
 if(isset($_POST['submit']))
 {
     $name = htmlspecialchars($_POST['station']);
@@ -39,6 +52,8 @@ if(isset($_POST['submit']))
 		$COLOR = $color;
 		$STATIC_TEXT_PRE=$static_text_pre;
 		$STATIC_TEXT_POST=$static_text_post;
+		
+	
 
 	//add the ability for GROWL to show changes upon submit :)
 	//	$.jGrowl("Station Id: $STATION_ID");	

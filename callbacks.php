@@ -73,7 +73,7 @@ function processCallback($argv) {
 	$data =  $argv[4];
 
 	logEntry($registrationType . " registration requestion from FPPD daemon");
-
+	$clearMessage=FALSE;
 		
 	switch ($registrationType) 
 	{
@@ -85,22 +85,33 @@ function processCallback($argv) {
 				$obj = json_decode($data);
 
 				$type = $obj->{'type'};
-				if($type == "event" || $type == "pause") {
-
-
-					logEntry("Resetting to due to event/pause");
+				if($type == "sequence") {
+					//we got a sequence... get the name
+					
+						$sequenceName = $obj->{'Sequence'};
+						logEntry("Sequence name: ".$sequenceName);
+						
+						if(strtoupper($sequenceName) == "BETABRITE-CLEAR.FSEQ") {
+							logEntry("Clear BetaBrite Sign");
+							$messageToSend="";
+							$clearMessage=TRUE;
+							
+						}
+						
 					exit(0);
-				}
-
-				$songTitle = $obj->{'title'};
-				$songArtist = $obj->{'artist'};
-			//	if($songArtist != "") {
+				} else {
+					$songTitle = $obj->{'title'};
+					$songArtist = $obj->{'artist'};
+				//	if($songArtist != "") {
 					logEntry("Song Title: ".$songTitle." Artist: ".$songArtist);
-					sendLineMessage($songTitle,$songArtist);
-			//		exit(0);
-			//		} 
-			}	
-		break;
+					$messageToSend = $sognTitle." - ".$songArtist;
+
+				}
+				
+				sendLineMessage($messageToSend,$clearMessage);
+			}
+			exit(0);
+			break;
 
 	}
 
@@ -119,7 +130,7 @@ function logEntry($data) {
 
 //function send the message
 
-function sendLineMessage($songTitle,$songArtist) {
+function sendLineMessage($line,$clearMessage=FALSE) {
 
 	global $betaBriteSettingsFile,$default_color,$errno, $errstr, $cfgTimeOut;
  if (file_exists($betaBriteSettingsFile)) {
@@ -173,7 +184,7 @@ function sendLineMessage($songTitle,$songArtist) {
 
 	logEntry("Sending Message to sign Looper: LOOP: ".$LOOPMESSAGE);
 	
-	$line = $songTitle. " - ".$songArtist;
+	
 	
 	//add pre and post text if they are here
 	
@@ -212,8 +223,13 @@ function sendLineMessage($songTitle,$songArtist) {
 	
 //	$cmd .= " ".$DEVICE;
 	
+	//process the clear sequence event //loop. but just send clear
+	if($clearMessage)  {
+		$LOOPMESSAGE="YES";
+		$line="";
+	}
 	
-	logEntry("COMMAND CMD: ".$cmd."\"".$line."\" ".$DEVICE);
+	logEntry("COMMAND clearmessage: ".$clearMessage. " CMD: ".$cmd."\"".$line."\" ".$DEVICE);
 	system($cmd."\"".$line."\" ".$DEVICE,$output);
 	
 	if($LOOPMESSAGE == "NO") {
