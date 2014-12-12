@@ -203,12 +203,13 @@ function sendLineMessage($line,$clearMessage=FALSE) {
 	//# Send line to scroller
 	$cmd = "/opt/fpp/plugins/BetaBrite/alphasign";
 	
+	$cmd .= $DEVICE_CONNECTION_TYPE. " ";
 	
 	switch ($DEVICE_CONNECTION_TYPE) {
 		
 		case "SERIAL":
 			$DEVICE=$DEVICE;
-			$cmd .= "Serial ";
+			
 			
 			break;
 			
@@ -216,7 +217,7 @@ function sendLineMessage($line,$clearMessage=FALSE) {
 			$DEVICE="\"".$IP.":".$PORT."\"";
 			//$DEVICE=$IP;
 			//$DEVICE = $IP." ".$PORT;
-			$cmd .= "IP "; //set the name to call
+			
 	}
 	
 	//$line = "TEST - TEST";
