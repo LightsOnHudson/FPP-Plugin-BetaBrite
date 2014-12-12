@@ -5,21 +5,20 @@ use lib "/home/pi/media/scripts/perl/";
 use AlphaSign;
 
 
-
-$sign->SetColor($sign->{COLOR_RED});
-
 my $input = $ARGV[0] || "";
-my $newline = $sign->{CTRL_NEWLINE};
 
 my $line1 = "";
 my $line2 = "";
+
 
 $line1 = $ARGV[0] if (defined($ARGV[0]));
 $line2 = $ARGV[1] if (defined($ARGV[1]));
 
 #my $sign = new AlphaSign("./test.out");
 my $sign = new AlphaSign("$line2");
+my $newline = $sign->{CTRL_NEWLINE};
 
+$sign->SetColor($sign->{COLOR_RED});
 if ($line1 ne "") {
 	if (length($line1) <= 16) {
 		$line1 = "\x1d\x31\x31" . $line1;
@@ -38,8 +37,6 @@ if ($line2 ne "") {
 
 
 my $str = $sign->{COLOR_RED} . $line1;
-
-$str .= $sign->{CTRL_NEWLINE} . $line2 if ($line2 ne "");
 
 $sign->print($str);
 

@@ -87,7 +87,7 @@ sub new {
 
 	# Some Defaults
 	$self->{SIGNID}        = "00"; # All Signs
-	$self->{MODE_CURRENT}  = $self->{MODE_HOLD};
+	$self->{MODE_CURRENT}  = $self->{MODE_ROTATE};
 	$self->{COLOR_CURRENT} = $self->{COLOR_RED};
 
 	return $self;
