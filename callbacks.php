@@ -1,60 +1,55 @@
 #!/usr/bin/php
 <?
 error_reporting(0);
-include 'config.inc';
 
-$betaBriteSettingsFile = "/home/pi/media/plugins/betabrite.settings";
-include 'php_serial.class.php';
+//include '/opt/fpp/www/config.php';
+//include_once("/opt/fpp/www/common.php");
+
+//include_once("config.inc"); //'config.inc';
+
+$settings=array();
+$settings['mediaDirectory'] = "/home/pi/media";
+$settings['logDirectory'] = "/home/pi/media/logs";
+
+//include_once("signControl.inc");
+
+$betaBriteSettingsFile = $settings['mediaDirectory']."/config/plugin.betabrite";
+
+
 //arg0 is  the program
 //arg1 is the first argument in the registration this will be --list
 //$DEBUG=true;
-$logFile = "/home/pi/media/logs/betabrite.log";
+$logFile = $settings['logDirectory']."/betabrite.log";
+//$logFile = $logDirectory."/logs/betabrite.log";
+
+
+logEntry("OPENING LOG FILE ".$logFile." but you know that, because you are seeing this now :) ");
+
 
 $callbackRegisters = "media\n";
 //var_dump($argv);
-$lockFile = "/home/pi/media/plugins/betabrite.loop";
+$lockFile =$settings['mediaDirectory']."/config/betabrite.loop";
 
 $myProcessId = getmypid();
 
-function doLockFile() {
 
-	global $lockFile,$myProcessId;
-
-if (file_exists($lockFile)) {
-                $filedata=file_get_contents($lockFile);
-                logEntry("Lock File Exists");
-
-		//read the lock file for the PID to kill
-			$filedata=file_get_contents($lockFile);
-	
-		if($filedata !="" )
-		{
-			logEntry("Running lock file in pid: ".$filedata);
-		}
-
- } else {
-
-	logEntry("RUNNING PD: ".$myProcessId);
-	$lockFileStatus= fopen($lockFile, "w") or die("Unable to open file!");
-		fwrite($lockFileStatus, $myProcessId);
-		fclose($lockFileStatus);
-
-}
-}
 switch ($argv[1])
 	{
 		case "--list":
 			echo $callbackRegisters;
 			logEntry("FPPD List Registration request: responded:". $callbackRegisters);
 			exit(0);
+			break;
 
 		case "--type":
 			//we got a register request message from the daemon
 			processCallback($argv);	
+			exit(0);
 			break;
 
 		default:
 			logEntry($argv[0]." called with no parameteres");
+			exit(0);
 			break;	
 	}
 
@@ -79,6 +74,7 @@ function processCallback($argv) {
 
 	logEntry($registrationType . " registration requestion from FPPD daemon");
 
+		
 	switch ($registrationType) 
 	{
 		case "media":
@@ -90,15 +86,7 @@ function processCallback($argv) {
 
 				$type = $obj->{'type'};
 				if($type == "event" || $type == "pause") {
-					//let's reset the callbacks / sign script
-				//	$cmd = "/usr/bin/killall -9 signLoop.php";
-				//	system($cmd,$output);
 
-				//	sleep(1);
-				//	$cmd = "/usr/bin/killall -9 callbacks.php";
-				//	system($cmd,$output);
-		//			$cmd = "/bin/rm /home/pi/media/plugins/betabrite.lock";
-		//			system($cmd,$output);
 
 					logEntry("Resetting to due to event/pause");
 					exit(0);
@@ -106,11 +94,11 @@ function processCallback($argv) {
 
 				$songTitle = $obj->{'title'};
 				$songArtist = $obj->{'artist'};
-				if($songArtist != "") {
+			//	if($songArtist != "") {
 					logEntry("Song Title: ".$songTitle." Artist: ".$songArtist);
 					sendLineMessage($songTitle,$songArtist);
-					exit(0);
-					} 
+			//		exit(0);
+			//		} 
 			}	
 		break;
 
@@ -172,69 +160,62 @@ function sendLineMessage($songTitle,$songArtist) {
                 
                 $configParts=explode("=",$settingParts[9]);
                 $STATIC_TEXT_POST= trim($configParts[1]);
+                
+                
         }
+        
+        
+
 
         logEntry("reading config file");
         logEntry("Station_ID: ".$STATION_ID." DEVICE: ".$DEVICE." DEVICE_CONNECTION_TYPE: ".$DEVICE_CONNECTION_TYPE." IP: ".$IP. " PORT: ".$PORT." LOOPMESSAGE: ".$LOOPMESSAGE." STATIC TEXT PRE: ".$STATIC_TEXT_PRE. " STATIC TEXT POST: ".$STATIC_TEXT_POST." LOOP TIME: ".$LOOPTIME."  Color: ".$cl_color);
 
 
 	logEntry("Sending Message to sign Looper: LOOP: ".$LOOPMESSAGE);
-	$myPid = getmypid();
-	logEntry("My pid? :".$myPid);
+	
 	$line = $songTitle. " - ".$songArtist;
-			//findCommandPID("/opt/fpp/plugins/BetaBrite/callbacks.php");
-			
-	//kill all signLoop processes running to reset them
-	killSignLoopProcesses();
-	sleep(1);
-
-			$cmd = "/usr/bin/php /opt/fpp/plugins/BetaBrite/signLoop.php ".$myPid." ".escapeshellarg_special($line);
-			
-            exec($cmd,$output);	
 	
-//	logEntry("I'm HERE");
-           // findCommandPID("signLoop.php");
-         //   sleep(2);
-           // logEntry("PID: ".findCommandPID("/opt/fpp/plugins/BetaBrite/signLoop.php"));
-		//	exit(0);
+	logEntry("INSIDE SEND");
+	//# Send line to scroller
+	$cmd = "/opt/fpp/plugins/BetaBrite/alphasign";
+	
+	
+	switch ($DEVICE_CONNECTION_TYPE) {
+		
+		case "SERIAL":
+			$DEVICE=$DEVICE;
+			$cmd .= "Serial ";
 			
-}
-
-function killSignLoopProcesses() {
+			break;
+			
+		case "IP":
+			$DEVICE="\"".$IP.":".$PORT."\"";
+			//$DEVICE=$IP;
+			//$DEVICE = $IP." ".$PORT;
+			$cmd .= "IP "; //set the name to call
+	}
 	
-	$cmdKill = "/bin/ps aux | grep -i signLoop.php";
-	exec($cmdKill,$output);
+	//$line = "TEST - TEST";
+	//$cmd .= "\"".$line."\"";
 	
-	for($i=0;$i<=count($output);$i++) {
+//	$cmd .= " ".$DEVICE;
+	
+	
+	logEntry("COMMAND CMD: ".$cmd."\"".$line."\" ".$DEVICE);
+	system($cmd."\"".$line."\" ".$DEVICE,$output);
+	
+	if($LOOPMESSAGE == "NO") {
+		logEntry("no looping: sending clear line");
+		//send a blank line after a few seconds
+		sleep(30);
 		
-		logEntry("signLoop process found:".$output[$i]);
-		
-		$processPieces =preg_split('/[\s]+/', $output[$i]);
-		
-		$processId = $processPieces[1];
-		logEntry("Kill id: ".$processId);
-		
-		$killProcessCmd = "kill ".$processId;
-		exec($killProcessCmd);//($killProcessCmd,$output);
+		$line = "";
+		logEntry("COMMAND CMD: ".$cmd."\"".$line."\" ".$DEVICE);
+		system($cmd."\"".$line."\" ".$DEVICE,$output);
 		
 		
 	}
-}
-function findCommandPID($command)
-{
-	logEntry("looking for pid");
-	
-	$cmdPS = "/bin/ps aux | grep -i '".$command."'";
-	logEntry("pid command: ".$cmdPS);
-	
-	exec($cmdPS,$output);
-	for($i=0;$i<=count($output);$i++) {
-		logEntry($output[$i]);
 		
-	}
-	
-	//the first one should be our command - remember it and kill itself off
-	
-	
-			}
+exit(0);			
+}
 ?>

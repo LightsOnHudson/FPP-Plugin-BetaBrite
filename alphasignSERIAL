@@ -4,8 +4,7 @@ use lib "/home/pi/media/scripts/perl/";
 
 use AlphaSign;
 
-#my $sign = new AlphaSign("./test.out");
-my $sign = new AlphaSign("/dev/ttyUSB1");
+
 
 $sign->SetColor($sign->{COLOR_RED});
 
@@ -17,6 +16,9 @@ my $line2 = "";
 
 $line1 = $ARGV[0] if (defined($ARGV[0]));
 $line2 = $ARGV[1] if (defined($ARGV[1]));
+
+#my $sign = new AlphaSign("./test.out");
+my $sign = new AlphaSign("$line2");
 
 if ($line1 ne "") {
 	if (length($line1) <= 16) {

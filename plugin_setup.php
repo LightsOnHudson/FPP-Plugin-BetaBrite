@@ -1,6 +1,6 @@
 <?php
 //$DEBUG=true;
-$miniRDSSettingsFile = $settings['mediaDirectory']."/config/plugin.betabrite";
+$betaBriteSettingsFile = $settings['mediaDirectory']."/config/plugin.betabrite";
 if(isset($_POST['submit']))
 {
     $name = htmlspecialchars($_POST['station']);
@@ -16,7 +16,7 @@ if(isset($_POST['submit']))
     $static_text_post = htmlspecialchars($_POST['static_text_post']);
 		//echo "Station Id set to: ".$name;
 
-		$betaBriteSettings = fopen($betaBriteSettingsFile, "w") or die("Unable to open file!");
+		$betaBriteSettings = fopen($betaBriteSettingsFile, "w") or die("Unable to open file BetaBrite Settings File!");
 		$txt = "STATION_ID=".trim($name)."\r\n";
 		$txt .= "DEVICE=".$device."\r\n";
 		$txt .= "DEVICE_CONNECTION_TYPE=".$device_connection_type."\r\n";
@@ -118,7 +118,7 @@ if(isset($_POST['submit']))
 
 <p>Known Issues:
 <ul>
-<li>NONE</li>
+<li>The Device SERIAL port is not remembered at this time to present to this screen. it is HOWEVER, saved in the file and will be used when click SAVE</li>
 </ul>
 
 <p>Configuration:
@@ -171,7 +171,7 @@ echo "<select name=\"device\"> \n";
         foreach(scandir("/dev/") as $fileName)
         {
                 if (preg_match("/^ttyUSB[0-9]+/", $fileName)) {
-			if($device == $filename)
+			if($DEVICE == $filename)
 			{
                         	echo "<option selected value=\"".$fileName."\">".$fileName."</option> \n";
 			} else {

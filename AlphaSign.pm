@@ -135,7 +135,24 @@ sub print {
 		$text . $this->{CTRL_EOT};
 
 	printf( $handle $data );
-	$handle->flush();
+	#$handle->flush();
+}
+
+sub createString {
+
+my $this = shift;
+	my $text = shift;
+	
+	my $data =
+		$this->{CTRL_INIT} . $this->{CTRL_SOH} . "Z" .
+		$this->{SIGNID} .
+		$this->{CTRL_STX} . "AA" . $this->{CTRL_ESC} .
+		"0" . $this->{MODE_ROTATE} . $this->{COLOR_CURRENT} .
+		$text . $this->{CTRL_EOT};
+
+	return $data;
+
+
 }
 
 1;
