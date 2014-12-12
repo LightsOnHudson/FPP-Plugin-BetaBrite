@@ -155,7 +155,8 @@ do {
 		$fs = fsockopen($IP, $PORT, $errno, $errstr, $cfgTimeOut);
 		if(!$fs) {
 			logEntry( "Error connecting to sign");
-			exit(0);
+			break;
+		//	exit(0);
 		}
 
 		$delay = ip_single_line_scroll($fs, $line, $scroller_color);
@@ -211,7 +212,7 @@ function ip_single_line_scroll ($fs, $combined, $scroller_color){
 	global $betaBriteSettingsFile;
 	include 'config.inc';
 
-	logEntry("sending via IP: ".$line);
+	logEntry("sending via IP: ".$combined);
 	//      # =-=-= Start of character counting =-=-=
 	//      # Added to the end of the message will be blank characters representing the length
 	//      # of the display. This is so we can calculate how long it will take the message
