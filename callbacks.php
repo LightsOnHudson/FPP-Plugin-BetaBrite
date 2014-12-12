@@ -52,6 +52,8 @@ switch ($argv[1])
 			exit(0);
 			break;	
 	}
+	
+	exit(0);
 
 function escapeshellarg_special($file) {
   return "'" . str_replace("'", "'\"'\"'", $file) . "'";
@@ -98,7 +100,6 @@ function processCallback($argv) {
 							
 						}
 						
-					exit(0);
 				} else {
 					$songTitle = $obj->{'title'};
 					$songArtist = $obj->{'artist'};
@@ -110,7 +111,7 @@ function processCallback($argv) {
 				
 				sendLineMessage($messageToSend,$clearMessage);
 			}
-			exit(0);
+			
 			break;
 
 	}
