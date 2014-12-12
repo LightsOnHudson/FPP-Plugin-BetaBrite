@@ -104,7 +104,7 @@ function processCallback($argv) {
 					$songArtist = $obj->{'artist'};
 				//	if($songArtist != "") {
 					logEntry("Song Title: ".$songTitle." Artist: ".$songArtist);
-					$messageToSend = $sognTitle." - ".$songArtist;
+					$messageToSend = $songTitle." - ".$songArtist;
 
 				}
 				
