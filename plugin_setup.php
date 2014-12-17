@@ -1,126 +1,61 @@
 <?php
 //$DEBUG=true;
-$betaBriteSettingsFile = $settings['mediaDirectory']."/config/plugin.betabrite";
+include_once "/opt/fpp/www/common.php";
+
+$pluginName = "BetaBrite";
+include_once "functions.inc.php";
+
+
 $betaBriteSequencePATH  = $settings['sequenceDirectory'];
 
 createBetaBriteSequenceFiles();
 
-//create sequence files
-function createBetaBriteSequenceFiles() {
-	global $betaBriteSequencePATH;
-	$betaBriteSequenceFileClear = $betaBriteSequencePATH."/"."BETABRITE-CLEAR.FSEQ";
-	
-	$tmpFile = fopen($betaBriteSequenceFileClear, "w") or die("Unable to open file BetaBrite Settings File!");
-	fclose($tmpFile);
-	
-}
 if(isset($_POST['submit']))
 {
-    $name = htmlspecialchars($_POST['station']);
-    $device = htmlspecialchars($_POST['device']);
-    $device_connection_type = htmlspecialchars($_POST['device_connection_type']);
-    $rt_text_path= htmlspecialchars($_POST['rt_text_path']);
-    $ip= htmlspecialchars($_POST['ip']);
-    $port= htmlspecialchars($_POST['port']);
-    $loopMessage= htmlspecialchars($_POST['loopMessage']);
-    $color= htmlspecialchars($_POST['color']);
-    $looptime = htmlspecialchars($_POST['looptime']);
-    $static_text_pre = htmlspecialchars($_POST['static_text_pre']);
-    $static_text_post = htmlspecialchars($_POST['static_text_post']);
-		//echo "Station Id set to: ".$name;
+	$name = htmlspecialchars($_POST['station']);
+	$device = htmlspecialchars($_POST['device']);
+	$device_connection_type = htmlspecialchars($_POST['device_connection_type']);
+	$rt_text_path= htmlspecialchars($_POST['rt_text_path']);
+	$ip= htmlspecialchars($_POST['ip']);
+	$port= htmlspecialchars($_POST['port']);
+	$loopMessage= htmlspecialchars($_POST['loopMessage']);
+	$color= htmlspecialchars($_POST['color']);
+	$looptime = htmlspecialchars($_POST['looptime']);
+	$static_text_pre = htmlspecialchars($_POST['static_text_pre']);
+	$static_text_post = htmlspecialchars($_POST['static_text_post']);
+	//echo "Station Id set to: ".$name;
 
-		$betaBriteSettings = fopen($betaBriteSettingsFile, "w") or die("Unable to open file BetaBrite Settings File!");
-		$txt = "STATION_ID=".trim($name)."\r\n";
-		$txt .= "DEVICE=".$device."\r\n";
-		$txt .= "DEVICE_CONNECTION_TYPE=".$device_connection_type."\r\n";
+	WriteSettingToFile("STATION_ID",trim($name),$pluginName);
+	WriteSettingToFile("DEVICE",trim($deivce),$pluginName);
+	WriteSettingToFile("DEVICE_CONNECTION_TYPE",trim($device_connection_type),$pluginName);
+	WriteSettingToFile("IP",trim($ip),$pluginName);
+	WriteSettingToFile("PORT",trim($port),$pluginName);
+	WriteSettingToFile("LOOP_MESSAGE",trim($loopMessage),$pluginName);
+	WriteSettingToFile("COLOR",trim($COLOR),$pluginName);
+	WriteSettingToFile("LOOPTIME",trim($looptime),$pluginName);
+	WriteSettingToFile("STATIC_TEXT_PRE",urlencode(trim($STATIC_TEXT_PRE),$pluginName));
+	WriteSettingToFile("STATIC_TEXT_POST",urlencode(trim($STATIC_TEXT_POST),$pluginName));
+	WriteSettingToFile("ENABLED",$_POST["ENABLED"],$pluginName);
 
-		$txt .= "IP=".trim($ip)."\r\n";
-		$txt .= "PORT=".trim($port)."\r\n";
-		$txt .= "LOOP_MESSAGE=".$loopMessage."\r\n";
-		$txt .= "COLOR=".$color."\r\n";
-		$txt .= "LOOPTIME=".trim($looptime)."\r\n";
-		$txt .= "STATIC_TEXT_PRE=".trim($static_text_pre)."\r\n";
-		$txt .= "STATIC_TEXT_POST=".trim($static_text_post)."\r\n";
-		fwrite($betaBriteSettings, $txt);
-		fclose($betaBriteSettings);
-		$STATION_ID=$name;
-		$DEVICE=$device;
-		$DEVICE_CONNECTION_TYPE=$device_connection_type;
-		$IP =$ip;
-		$PORT =$port;
-		$LOOPMESSAGE=$loopMessage;
-		$COLOR = $color;
-		$STATIC_TEXT_PRE=$static_text_pre;
-		$STATIC_TEXT_POST=$static_text_post;
-		
-	
 
-	//add the ability for GROWL to show changes upon submit :)
-	//	$.jGrowl("Station Id: $STATION_ID");	
-        
-  
- 
 
 } else {
 
-	if($DEBUG)
-		echo "READING FILE: <br/> \n";
-	//try to read the settings file if available
-
-
-	if (file_exists($betaBriteSettingsFile)) {
-		$filedata=file_get_contents($betaBriteSettingsFile);
-	} 
+	$STATION_ID = ReadSettingFromFile("STATION_ID",$pluginName);
+	$DEVICE = ReadSettingFromFile("DEVICE",$pluginName);
+	$DEVICE_CONNECTION_TYPE = ReadSettingFromFile("DEVICE_CONNECTION_TYPE",$pluginName);
+	$IP = ReadSettingFromFile("IP",$pluginName);
+	$PORT = ReadSettingFromFile("PORT",$pluginName);
+	$LOOPMESSAGE = ReadSettingFromFile("LOOPMESSAGE",$pluginName);
+	$COLOR = ReadSettingFromFile("COLOR",$pluginName);
+	$STATIC_TEXT_PRE = urldecode(ReadSettingFromFile("STATIC_TEXT_PRE",$pluginName));
+	$STATIC_TEXT_POST = urldecode(ReadSettingFromFile("STATIC_TEXT_POST",$pluginName));
+	$ENABLED = ReadSettingFromFile("ENABLED",$pluginName);
 	
-	if($filedata !="" )
-	{
-		$settingParts = explode("\r",$filedata);
-		$configParts=explode("=",$settingParts[0]);
-		$STATION_ID = $configParts[1];
-		
-		$configParts=explode("=",$settingParts[1]);
-		$DEVICE = $configParts[1];
-		
-		$configParts=explode("=",$settingParts[2]);
-		$DEVICE_CONNECTION_TYPE = $configParts[1];
 	
-		$configParts=explode("=",$settingParts[3]);
-		$IP = $configParts[1];
-	
-		$configParts=explode("=",$settingParts[4]);
-		$PORT = $configParts[1];
-
-                $configParts=explode("=",$settingParts[5]);
-                $LOOPMESSAGE = $configParts[1];
-
-		$configParts=explode("=",$settingParts[6]);
-                $COLOR= $configParts[1];
-           $configParts=explode("=",$settingParts[7]);
-          $LOOPTIME= $configParts[1];
-
-          $configParts=explode("=",$settingParts[8]);
-          $STATIC_TEXT_PRE = $configParts[1];
-          
-          $configParts=explode("=",$settingParts[9]);
-          $STATIC_TEXT_POST = $configParts[1];
-                
 	}
-	fclose($file_handle);
+	
 
-}
-        if($DEBUG) {
-		echo "STATION: ".$STATION_ID."<br/> \n";
-		echo "DEVICE: ".$DEVICE."<br/> \n";
-		
-                echo "IP: ".$IP."<br/> \n";
-                echo "PORT: ".$PORT."<br/> \n";
-                echo "DEVICE CONNECTION TYPE: ".$DEVICE_CONNECTION_TYPE."<br/> \n";
-                echo "LOOP MESSAGE: ".$LOOPMESSAGE."<br/> \n";
-                echo "COLOR: ".$COLOR."<br/> \n";
-                echo "LOOP TIME: ".$LOOPTIME."<br/> \n";
-                echo "STATIC TEXT PRE: ".$STATIC_TEXT_PRE."<br/> \n";
-                echo "STATIC TEXT POST: ".$STATIC_TEXT_POST."<br/> \n";
-                }
 ?>
 
 <html>
@@ -142,6 +77,17 @@ if(isset($_POST['submit']))
 </ul>
 
 <form method="post" action="http://<? echo $_SERVER['SERVER_NAME']?>/plugin.php?plugin=BetaBrite&page=plugin_setup.php">
+echo "ENABLE PLUGIN: ";
+
+if($ENABLED== 1 ) {
+		echo "<input type=\"checkbox\" checked name=\"ENABLED\"> \n";
+//PrintSettingCheckbox("Radio Station", "ENABLED", $restart = 0, $reboot = 0, "ON", "OFF", $pluginName = $pluginName, $callbackName = "");
+	} else {
+		echo "<input type=\"checkbox\"  name=\"ENABLED\"> \n";
+}
+
+
+echo "<p/> \n";
 Manually Set Station ID<br>
 <p><label for="station_ID">Station ID:</label>
 <input type="text" value="<? if($STATION_ID !="" ) { echo $STATION_ID; } else { echo "";};?>" name="station" id="station_ID"></input>
