@@ -5,9 +5,36 @@ function escapeshellarg_special($file) {
 	return "'" . str_replace("'", "'\"'\"'", $file) . "'";
 }
 
+//process sequence types
+
+function processSequenceName($sequenceName) {
+	logEntry("Sequence name: ".$sequenceName);
+	
+	$sequenceName = strtoupper($sequenceName);
+	
+	switch ($sequenceName) {
+		
+		case "BETABRITE-CLEAR.FSEQ":
+
+		logEntry("Clear BetaBrite Sign");
+		$messageToSend="";
+		sendLineMessage($messageToSend,$clearMessage=TRUE);
+			break;
+			exit(0);
+			
+		default:
+			logEntry("We do not support sequence name: ".$sequenceName." at this time");
+			
+			exit(0);
+			
+	}
+	
+}
 function processCallback($argv) {
 
-	global $DEBUG;
+	global $DEBUG,$pluginName;
+	
+	$SEPARATOR = urldecode(ReadSettingFromFile("SEPARATOR",$pluginName));
 
 	if($DEBUG)
 		print_r($argv);
@@ -20,7 +47,7 @@ function processCallback($argv) {
 	$registrationType = $argv[2];
 	$data =  $argv[4];
 
-	logEntry($registrationType . " registration requestion from FPPD daemon");
+	logEntry("PROCESSING CALLBACK");
 	$clearMessage=FALSE;
 
 	switch ($registrationType)
@@ -33,32 +60,45 @@ function processCallback($argv) {
 				$obj = json_decode($data);
 
 				$type = $obj->{'type'};
-				if($type == "sequence") {
-					//we got a sequence... get the name
-						
-					$sequenceName = $obj->{'Sequence'};
-					logEntry("Sequence name: ".$sequenceName);
-
-					if(strtoupper($sequenceName) == "BETABRITE-CLEAR.FSEQ") {
-						logEntry("Clear BetaBrite Sign");
-						$messageToSend="";
-						$clearMessage=TRUE;
-							
-					}
-
-				} else {
+				
+				switch ($type) {
+					
+					case "sequence":
+								
+					//$sequenceName = ;
+					processSequenceName($obj->{'Sequence'});
+					
+					break;
+					case "media":
+					
+					logEntry("MEDIA ENTRY: EXTRACTING TITLE AND ARTIST");
+					
 					$songTitle = $obj->{'title'};
 					$songArtist = $obj->{'artist'};
 					//	if($songArtist != "") {
-					logEntry("Song Title: ".$songTitle." Artist: ".$songArtist);
-					$messageToSend = $songTitle." - ".$songArtist;
+				
+				
+					$messageToSend = $songTitle." ".$SEPARATOR." ".$songArtist;
+					logEntry("MESSAGE to send: ".$messageToSend);
+					sendLineMessage($messageToSend,$clearMessage);
 
+				break;
+				
+					default:
+						logEntry("We do not understand: type: ".$obj->{'type'}. " at this time");
+						exit(0);
+						break;
+						
 				}
 
-				sendLineMessage($messageToSend,$clearMessage);
+				
 			}
 				
 			break;
+			exit(0);
+			
+		default:
+			exit(0);
 
 	}
 
@@ -79,9 +119,9 @@ function logEntry($data) {
 
 function sendLineMessage($line,$clearMessage=FALSE) {
 
-	global $default_color,$errno, $errstr, $cfgTimeOut;
-
-	$STATION_ID = ReadSettingFromFile("STATION_ID",$pluginName);
+	global $default_color,$errno, $errstr, $cfgTimeOut,$pluginName;
+	
+	$STATION_ID = urldecode(ReadSettingFromFile("STATION_ID",$pluginName));
 	$DEVICE = ReadSettingFromFile("DEVICE",$pluginName);
 	$DEVICE_CONNECTION_TYPE = ReadSettingFromFile("DEVICE_CONNECTION_TYPE",$pluginName);
 	$IP = ReadSettingFromFile("IP",$pluginName);
@@ -90,17 +130,26 @@ function sendLineMessage($line,$clearMessage=FALSE) {
 	$COLOR = ReadSettingFromFile("COLOR",$pluginName);
 	$STATIC_TEXT_PRE = urldecode(ReadSettingFromFile("STATIC_TEXT_PRE",$pluginName));
 	$STATIC_TEXT_POST = urldecode(ReadSettingFromFile("STATIC_TEXT_POST",$pluginName));
+	$ENABLED = ReadSettingFromFile("ENABLED",$pluginName);
+	$LOOPTIME = ReadSettingFromFile("LOOPTIME",$pluginName);
+	
+	//FORCE
+	$LOOPMESSAGE="YES";
 
+logEntry("STATION_ID: ".$STATION_ID);
+logEntry("DEVICE: ".$DEVICE);
+logEntry("DEVICE_CONNECTION_TYPE: ".$DEVICE_CONNECTION_TYPE);
+logEntry("IP: ".$IP);
+logEntry("PORT: ".$PORT);
+logEntry("LOOPMESSAGE: ".$LOOPMESSAGE);
+logEntry("COLOR: ".$COLOR);
+logEntry("LOOPTIME: ".$LOOPTIME);
+logEntry("STATIC_TEXT_PRE: ".$STATIC_TEXT_PRE);
+logEntry("STATIC_TEXT_POST: ".$STATIC_TEXT_POST);
+logEntry("ENABLED: ".$ENABLED);
+logEntry("LOOPTIME: ".$LOOPTIME);
 
-
-
-	//   logEntry("reading config file");
-	logEntry("Station_ID: ".$STATION_ID." DEVICE: ".$DEVICE." DEVICE_CONNECTION_TYPE: ".$DEVICE_CONNECTION_TYPE." IP: ".$IP. " PORT: ".$PORT." LOOPMESSAGE: ".$LOOPMESSAGE." STATIC TEXT PRE: ".$STATIC_TEXT_PRE. " STATIC TEXT POST: ".$STATIC_TEXT_POST." LOOP TIME: ".$LOOPTIME."  Color: ".$cl_color);
-
-
-	logEntry("Sending Message to sign Looper: LOOP: ".$LOOPMESSAGE);
-
-
+	
 
 	//add pre and post text if they are here
 
@@ -114,7 +163,7 @@ function sendLineMessage($line,$clearMessage=FALSE) {
 	}
 
 
-	logEntry("INSIDE SEND");
+
 	//# Send line to scroller
 	$cmd = "/opt/fpp/plugins/BetaBrite/alphasign";
 
@@ -141,20 +190,20 @@ function sendLineMessage($line,$clearMessage=FALSE) {
 		$line="";
 	}
 
-	logEntry("COMMAND clearmessage: ".$clearMessage. " CMD: ".$cmd."\"".$line."\" ".$DEVICE);
+	logEntry("SENDING COMMAND: ".$cmd."\"".$line."\" ".$DEVICE);
 	system($cmd."\"".$line."\" ".$DEVICE,$output);
 
-	if($LOOPMESSAGE == "NO") {
-		logEntry("no looping: sending clear line");
-		//send a blank line after a few seconds
-		sleep(30);
+//	if($LOOPMESSAGE == "NO") {
+//		logEntry("no looping: sending clear line");
+//		//send a blank line after a few seconds
+//		sleep(30);
 
-		$line = "";
-		logEntry("COMMAND CMD: ".$cmd."\"".$line."\" ".$DEVICE);
-		system($cmd."\"".$line."\" ".$DEVICE,$output);
+//		$line = "";
+//		logEntry("COMMAND CMD: ".$cmd."\"".$line."\" ".$DEVICE);
+//		system($cmd."\"".$line."\" ".$DEVICE,$output);
 
 
-	}
+//	}
 }
 
 //create sequence files

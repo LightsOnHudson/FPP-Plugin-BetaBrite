@@ -2,44 +2,52 @@
 <?
 error_reporting(0);
 
+$pluginName ="BetaBrite";
+
+
 $skipJSsettings = 1;
-include_once '/opt/fpp/www/config.php';
+include_once("/opt/fpp/www/config.php");
 include_once("/opt/fpp/www/common.php");
 include_once("functions.inc.php");
 
+$ENABLED="";
+
+$ENABLED = trim(urldecode(ReadSettingFromFile("ENABLED",$pluginName)));
 
 //arg0 is  the program
 //arg1 is the first argument in the registration this will be --list
 //$DEBUG=true;
-$logFile = $settings['logDirectory']."/betabrite.log";
+$logFile = $settings['logDirectory']."/".$pluginName.".log";
 //$logFile = $logDirectory."/logs/betabrite.log";
+//echo "Enabled: ".$ENABLED."<br/> \n";
 
 
-logEntry("OPENING LOG FILE ".$logFile." but you know that, because you are seeing this now :) ");
-
-
+if($ENABLED != "on" && $ENABLED != "1") {
+	logEntry("Plugin Status: DISABLED Please enable in Plugin Setup to use & Restart FPPD Daemon");
+	
+	exit(0);
+}
 $callbackRegisters = "media\n";
 //var_dump($argv);
 
-switch ($argv[1])
-	{
-		case "--list":
+$FPPD_COMMAND = $argv[1];
+
+//echo "FPPD Command: ".$FPPD_COMMAND."<br/> \n";
+
+if($FPPD_COMMAND == "--list") {
+
 			echo $callbackRegisters;
 			logEntry("FPPD List Registration request: responded:". $callbackRegisters);
 			exit(0);
-			break;
+}
 
-		case "--type":
+if($FPPD_COMMAND == "--type") {
+			logEntry("type callback requested");
 			//we got a register request message from the daemon
 			processCallback($argv);	
 			exit(0);
-			break;
+}
 
-		default:
 			logEntry($argv[0]." called with no parameteres");
 			exit(0);
-			break;	
-	}
-	
-exit(0);
 ?>

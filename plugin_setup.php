@@ -1,47 +1,61 @@
 <?php
 //$DEBUG=true;
-include_once "/opt/fpp/www/common.php";
+//include_once "/opt/fpp/www/common.php";
 
 $pluginName = "BetaBrite";
 include_once "functions.inc.php";
 
 
+
+$DEBUG = false;
+
+$IP=trim($_POST["IP"]);
+$PORT=trim($_POST["PORT"]);
+$STATION_ID=trim($_POST["STATION_ID"]);
+$DEVICE=trim($_POST["DEVICE"]);
+$DEVICE_CONNECTION_TYPE=trim($_POST["DEVICE_CONNECTION_TYPE"]);
+$COLOR=trim($_POST["COLOR"]);
+$STATIC_TEXT_POST=trim($_POST["STATIC_TEXT_POST"]);
+$STATIC_TEXT_PRE=trim($_POST["STATIC_TEXT_PRE"]);
+$ENABLED=$_POST["ENABLED"];
+$LOOPMESSAGE=$_POST["LOOPMESSAGE"];
+$LOOPTIME=$_POST["LOOPTIME"];
+$SEPARATOR = $_POST["SEPARATOR"];
+
+
+if($DEBUG) {
+
+	echo "PORT: ".$_POST['PORT'];//print_r($_POST["PORT"]);
+	echo "loop message: ".$_POST["LOOPMESSAGE"]."<br/> \n";
+	
+}
+
 $betaBriteSequencePATH  = $settings['sequenceDirectory'];
 
-createBetaBriteSequenceFiles();
+//createBetaBriteSequenceFiles();
 
 if(isset($_POST['submit']))
 {
-	$name = htmlspecialchars($_POST['station']);
-	$device = htmlspecialchars($_POST['device']);
-	$device_connection_type = htmlspecialchars($_POST['device_connection_type']);
-	$rt_text_path= htmlspecialchars($_POST['rt_text_path']);
-	$ip= htmlspecialchars($_POST['ip']);
-	$port= htmlspecialchars($_POST['port']);
-	$loopMessage= htmlspecialchars($_POST['loopMessage']);
-	$color= htmlspecialchars($_POST['color']);
-	$looptime = htmlspecialchars($_POST['looptime']);
-	$static_text_pre = htmlspecialchars($_POST['static_text_pre']);
-	$static_text_post = htmlspecialchars($_POST['static_text_post']);
-	//echo "Station Id set to: ".$name;
 
-	WriteSettingToFile("STATION_ID",trim($name),$pluginName);
-	WriteSettingToFile("DEVICE",trim($deivce),$pluginName);
-	WriteSettingToFile("DEVICE_CONNECTION_TYPE",trim($device_connection_type),$pluginName);
-	WriteSettingToFile("IP",trim($ip),$pluginName);
-	WriteSettingToFile("PORT",trim($port),$pluginName);
-	WriteSettingToFile("LOOP_MESSAGE",trim($loopMessage),$pluginName);
-	WriteSettingToFile("COLOR",trim($COLOR),$pluginName);
-	WriteSettingToFile("LOOPTIME",trim($looptime),$pluginName);
-	WriteSettingToFile("STATIC_TEXT_PRE",urlencode(trim($STATIC_TEXT_PRE),$pluginName));
-	WriteSettingToFile("STATIC_TEXT_POST",urlencode(trim($STATIC_TEXT_POST),$pluginName));
-	WriteSettingToFile("ENABLED",$_POST["ENABLED"],$pluginName);
+//	echo "Writring config fie <br/> \n";
 
-
+	WriteSettingToFile("DEVICE",$DEVICE,$pluginName);
+	WriteSettingToFile("DEVICE_CONNECTION_TYPE",$DEVICE_CONNECTION_TYPE,$pluginName);
+	WriteSettingToFile("IP",$IP,$pluginName);
+	WriteSettingToFile("PORT",$PORT,$pluginName);
+	WriteSettingToFile("LOOPMESSAGE",$LOOPMESSAGE,$pluginName);
+	WriteSettingToFile("COLOR",$COLOR,$pluginName);
+	WriteSettingToFile("LOOPTIME",$LOOPTIME,$pluginName);
+	WriteSettingToFile("STATIC_TEXT_PRE",urlencode($STATIC_TEXT_PRE),$pluginName);
+	WriteSettingToFile("STATIC_TEXT_POST",urlencode($STATIC_TEXT_POST),$pluginName);
+	WriteSettingToFile("ENABLED",$ENABLED,$pluginName);
+	WriteSettingToFile("STATION_ID",urlencode($STATION_ID),$pluginName);
+	WriteSettingToFile("SEPARATOR",urlencode($SEPARATOR),$pluginName);
 
 } else {
 
-	$STATION_ID = ReadSettingFromFile("STATION_ID",$pluginName);
+	
+	$STATION_ID = urldecode(ReadSettingFromFile("STATION_ID",$pluginName));
 	$DEVICE = ReadSettingFromFile("DEVICE",$pluginName);
 	$DEVICE_CONNECTION_TYPE = ReadSettingFromFile("DEVICE_CONNECTION_TYPE",$pluginName);
 	$IP = ReadSettingFromFile("IP",$pluginName);
@@ -51,11 +65,16 @@ if(isset($_POST['submit']))
 	$STATIC_TEXT_PRE = urldecode(ReadSettingFromFile("STATIC_TEXT_PRE",$pluginName));
 	$STATIC_TEXT_POST = urldecode(ReadSettingFromFile("STATIC_TEXT_POST",$pluginName));
 	$ENABLED = ReadSettingFromFile("ENABLED",$pluginName);
+	$LOOPTIME = ReadSettingFromFile("LOOPTIME",$pluginName);
+	$SEPARATOR = urldecode(ReadSettingFromFile("SEPARATOR",$pluginName));
 	
 	
-	}
-	
+}
 
+//the library keeps repeating the message. send a clear
+
+$LOOPMESSAGE="YES";
+//echo "Enabled: ".$ENABLED."<br/> \n";
 ?>
 
 <html>
@@ -77,9 +96,10 @@ if(isset($_POST['submit']))
 </ul>
 
 <form method="post" action="http://<? echo $_SERVER['SERVER_NAME']?>/plugin.php?plugin=BetaBrite&page=plugin_setup.php">
+<?php 
 echo "ENABLE PLUGIN: ";
 
-if($ENABLED== 1 ) {
+if($ENABLED == "on" || $ENABLED == 1) {
 		echo "<input type=\"checkbox\" checked name=\"ENABLED\"> \n";
 //PrintSettingCheckbox("Radio Station", "ENABLED", $restart = 0, $reboot = 0, "ON", "OFF", $pluginName = $pluginName, $callbackName = "");
 	} else {
@@ -88,9 +108,11 @@ if($ENABLED== 1 ) {
 
 
 echo "<p/> \n";
+
+?>
 Manually Set Station ID<br>
-<p><label for="station_ID">Station ID:</label>
-<input type="text" value="<? if($STATION_ID !="" ) { echo $STATION_ID; } else { echo "";};?>" name="station" id="station_ID"></input>
+<p><label for="STATION_ID">Station ID:</label>
+<input type="text" value="<? if($STATION_ID !="" ) { echo $STATION_ID; } else { echo "";};?>" name="STATION_ID" id="STATION_ID"></input>
 (Expected format: up to 8 characters)
 </p>
 
@@ -98,7 +120,7 @@ Manually Set Station ID<br>
 
 echo "Connection type: \n";
 
-echo "<select name=\"device_connection_type\"> \n";
+echo "<select name=\"DEVICE_CONNECTION_TYPE\"> \n";
                         if($DEVICE_CONNECTION_TYPE != "")
                         {
 				switch ($DEVICE_CONNECTION_TYPE)
@@ -128,7 +150,7 @@ echo "<p/> \n";
 
 echo "<p/> \n";
 echo "SERIAL DEVICE: \n";
-echo "<select name=\"device\"> \n";
+echo "<select name=\"DEVICE\"> \n";
         foreach(scandir("/dev/") as $fileName)
         {
                 if (preg_match("/^ttyUSB[0-9]+/", $fileName)) {
@@ -145,34 +167,35 @@ echo "</select> \n";
 
 <p/>
 IP: 
-<input type="text" value="<? if($IP !="" ) { echo $IP; } else { echo "";}?>" name="ip" id="ip"></input>
+<input type="text" value="<? if($IP !="" ) { echo $IP; } else { echo "";}?>" name="IP" id="IP"></input>
 
 <p/>
 
 PORT:
-<input type="text" value="<? if($PORT !="" ) { echo $PORT; } else { echo "";}?>" name="port" id="port"></input>
+<input type="text" value="<? if($PORT !="" ) { echo $PORT; } else { echo "";}?>" name="PORT" id="PORT"></input>
 
 <p/>
 
 STATIC TEXT PRE:
-<input type="text" size="64" value="<? if($STATIC_TEXT_PRE !="" ) { echo $STATIC_TEXT_PRE; } else { echo "";}?>" name="static_text_pre" id="static_text_pre"></input>
+<input type="text" size="64" value="<? if($STATIC_TEXT_PRE !="" ) { echo $STATIC_TEXT_PRE; } else { echo "";}?>" name="STATIC_TEXT_PRE" id="STATIC_TEXT_PRE"></input>
 
 
 <p/>
 
 STATIC TEXT POST:
-<input type="text" size="64" value="<? if($STATIC_TEXT_POST !="" ) { echo $STATIC_TEXT_POST; } else { echo "";}?>" name="static_text_post" id="static_text_post"></input>
+<input type="text" size="64" value="<? if($STATIC_TEXT_POST !="" ) { echo $STATIC_TEXT_POST; } else { echo "";}?>" name="STATIC_TEXT_POST" id="STATIC_TEXT_POST"></input>
 
 <p/>
-
+<!-- 
 LOOP time (in secs):
-<input type="text" value="<? if($LOOPTIME !="" ) { echo $LOOPTIME; } else { echo "10";}?>" name="looptime" id="looptime"></input>
+<input type="text" value="<? if($LOOPTIME !="" ) { echo $LOOPTIME; } else { echo "10";}?>" name="LOOPTIME" id="LOOPTIME"></input>
 
 
 <p/>
+
 LOOP:
 <?
-echo "<select name=\"loopMessage\"> \n";
+echo "<select name=\"LOOPMESSAGE\"> \n";
 
 		switch ($LOOPMESSAGE) {
 
@@ -195,19 +218,29 @@ echo "<select name=\"loopMessage\"> \n";
         
 echo "</select> \n";
 ?>
+-->
 <p/>
 COLOR:
 <?
 
 //create an array of color here
-echo "<select name=\"color\"> \n";
+echo "<select name=\"COLOR\"> \n";
                       echo "<option value=\"YELLOW\">YELLOW</option> \n";
                       echo "<option value=\"GREEN\">GREEN</option> \n";
                       echo "<option value=\"RAINBOW\">RAINBOW</option> \n";
 
 
 echo "</select> \n";
+
+
 ?>
+
+
+<p/>
+
+Separator between SongTitle & Song Artist:
+<input type="text" value="<? if($SEPARATOR !="" ) { echo $SEPARATOR; } else { echo "-";}?>" name="SEPARATOR" id="SEPARATOR"></input>
+
 <p/>
 <input id="submit_button" name="submit" type="submit" class="buttons" value="Save Config">
 </form>
