@@ -28,6 +28,7 @@ if($ENABLED != "on" && $ENABLED != "1") {
 	exit(0);
 }
 $callbackRegisters = "media\n";
+$myPid = getmypid();
 //var_dump($argv);
 
 $FPPD_COMMAND = $argv[1];
