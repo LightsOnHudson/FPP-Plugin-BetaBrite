@@ -83,6 +83,20 @@ function processCallback($argv) {
 					sendLineMessage($messageToSend,$clearMessage);
 
 				break;
+				case "both":
+						
+					logEntry("MEDIA ENTRY: EXTRACTING TITLE AND ARTIST");
+						
+					$songTitle = $obj->{'title'};
+					$songArtist = $obj->{'artist'};
+					//	if($songArtist != "") {
+				
+				
+					$messageToSend = $songTitle." ".$SEPARATOR." ".$songArtist;
+					logEntry("MESSAGE to send: ".$messageToSend);
+					sendLineMessage($messageToSend,$clearMessage);
+				
+					break;
 				
 					default:
 						logEntry("We do not understand: type: ".$obj->{'type'}. " at this time");
