@@ -133,7 +133,7 @@ function logEntry($data) {
 
 function sendLineMessage($line,$clearMessage=FALSE) {
 
-	global $default_color,$errno, $errstr, $cfgTimeOut,$pluginName;
+	global $default_color,$errno, $errstr, $cfgTimeOut,$pluginName,$pluginDirectory;
 	
 	$STATION_ID = urldecode(ReadSettingFromFile("STATION_ID",$pluginName));
 	$DEVICE = ReadSettingFromFile("DEVICE",$pluginName);
@@ -179,7 +179,9 @@ logEntry("LOOPTIME: ".$LOOPTIME);
 
 
 	//# Send line to scroller
-	$cmd = "/opt/fpp/plugins/BetaBrite/alphasign";
+	//$cmd = "/opt/fpp/plugins/BetaBrite/alphasign";
+	$cmd = $pluginDirectory . "/".$pluginName."/"."alphasign";
+	
 
 	$cmd .= $DEVICE_CONNECTION_TYPE. " ";
 
