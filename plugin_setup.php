@@ -246,7 +246,7 @@ Separator between SongTitle & Song Artist:
 </form>
 
 
-<p>To report a bug, please file it against the BetaBrite plugin project on Git: https://github.com/LightsOnHudson/FPP-Plugin-BetaBrite
+<p>To report a bug, please file it against the BetaBrite plug-in project on Git: https://github.com/LightsOnHudson/FPP-Plugin-BetaBrite
 
 </fieldset>
 </div>
