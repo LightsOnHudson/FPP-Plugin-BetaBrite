@@ -7,8 +7,11 @@ $pluginName ="BetaBrite";
 
 $skipJSsettings = 1;
 include_once("/opt/fpp/www/config.php");
+include("config/config.inc");
 include_once("/opt/fpp/www/common.php");
 include_once("functions.inc.php");
+include_once("commonFunctions.inc.php");
+include 'php_serial.class.php';
 
 $ENABLED="";
 

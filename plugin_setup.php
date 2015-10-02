@@ -4,8 +4,16 @@
 
 $pluginName = "BetaBrite";
 include_once "functions.inc.php";
+include_once "commonFunctions.inc.php";
+include "config/config.inc";
 
+$pluginUpdateFile = $settings['pluginDirectory']."/".$pluginName."/"."pluginUpdate.inc";
+$logFile = $settings['logDirectory']."/".$pluginName.".log";
+$myPid = getmypid();
 
+$gitURL = "https://github.com/LightsOnHudson/FPP-Plugin-BetaBrite.git";
+
+logEntry("plugin update file: ".$pluginUpdateFile);
 
 $DEBUG = false;
 
@@ -21,7 +29,6 @@ $ENABLED=$_POST["ENABLED"];
 $LOOPMESSAGE=$_POST["LOOPMESSAGE"];
 $LOOPTIME=$_POST["LOOPTIME"];
 $SEPARATOR = $_POST["SEPARATOR"];
-
 
 if($DEBUG) {
 
@@ -55,20 +62,28 @@ if(isset($_POST['submit']))
 } else {
 
 	
-	$STATION_ID = urldecode(ReadSettingFromFile("STATION_ID",$pluginName));
-	$DEVICE = ReadSettingFromFile("DEVICE",$pluginName);
-	$DEVICE_CONNECTION_TYPE = ReadSettingFromFile("DEVICE_CONNECTION_TYPE",$pluginName);
-	$IP = ReadSettingFromFile("IP",$pluginName);
-	$PORT = ReadSettingFromFile("PORT",$pluginName);
-	$LOOPMESSAGE = ReadSettingFromFile("LOOPMESSAGE",$pluginName);
-	$COLOR = ReadSettingFromFile("COLOR",$pluginName);
-	$STATIC_TEXT_PRE = urldecode(ReadSettingFromFile("STATIC_TEXT_PRE",$pluginName));
-	$STATIC_TEXT_POST = urldecode(ReadSettingFromFile("STATIC_TEXT_POST",$pluginName));
-	$ENABLED = ReadSettingFromFile("ENABLED",$pluginName);
-	$LOOPTIME = ReadSettingFromFile("LOOPTIME",$pluginName);
-	$SEPARATOR = urldecode(ReadSettingFromFile("SEPARATOR",$pluginName));
+	$STATION_ID = $pluginSettings['STATION_ID'];
+	$DEVICE = $pluginSettings['DEVICE'];
+	$DEVICE_CONNECTION_TYPE = $pluginSettings['DEVICE_CONNECTION_TYPE'];
+	$IP = $pluginSettings['IP'];
+	$PORT = $pluginSettings['PORT'];
+	$LOOPMESSAGE = $pluginSettings['LOOPMESSAGE'];
+	$COLOR = $pluginSettings['COLOR'];
+	$STATIC_TEXT_PRE = $pluginSettings['STATIC_TEXT_PRE'];
+	$STATIC_TEXT_POST = $pluginSettings['STATIC_TEXT_POST'];
+	$ENABLED = $pluginSettings['ENABLED'];
+	$LOOPTIME = $pluginSettings['LOOPTIME'];
+	$SEPARATOR = $pluginSettings['SEPARATOR'];
 	
 	
+}
+
+if(isset($_POST['updatePlugin']))
+{
+	logEntry("updating plugin...");
+	$updateResult = updatePluginFromGitHub($gitURL, $branch="master", $pluginName);
+
+	echo $updateResult."<br/> \n";
 }
 
 //the library keeps repeating the message. send a clear
@@ -81,18 +96,17 @@ $LOOPMESSAGE="YES";
 <head>
 </head>
 
-<div id="rds" class="settings">
+<div id="beta" class="settings">
 <fieldset>
 <legend>BetaBrite Support Instructions</legend>
 
 <p>Known Issues:
 <ul>
-<li>The Device SERIAL port is not remembered at this time to present to this screen. it is HOWEVER, saved in the file and will be used when click SAVE</li>
-</ul>
+<li>None known</ul>
 
 <p>Configuration:
 <ul>
-<li>Configure your connection type, IP, Serial, Static text you want to send in front of Artist and song and post text, loop time if you want looping and color</li>
+<li>Configure your connection type, Serial, Static text you want to send in front of Artist and song and post text, loop time if you want looping and color</li>
 </ul>
 
 <form method="post" action="http://<? echo $_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']?>/plugin.php?plugin=BetaBrite&page=plugin_setup.php">
@@ -127,7 +141,7 @@ echo "<select name=\"DEVICE_CONNECTION_TYPE\"> \n";
 				{
 					case "SERIAL":
                                 		echo "<option selected value=\"".$DEVICE_CONNECTION_TYPE."\">".$DEVICE_CONNECTION_TYPE."</option> \n";
-                                		echo "<option value=\"IP\">IP</option> \n";
+                                //		echo "<option value=\"IP\">IP</option> \n";
                                 		break;
 					case "IP":
                                 		echo "<option selected value=\"".$DEVICE_CONNECTION_TYPE."\">".$DEVICE_CONNECTION_TYPE."</option> \n";
@@ -141,7 +155,7 @@ echo "<select name=\"DEVICE_CONNECTION_TYPE\"> \n";
 			} else {
 
                                 echo "<option value=\"SERIAL\">SERIAL</option> \n";
-                                echo "<option value=\"IP\">IP</option> \n";
+                          //      echo "<option value=\"IP\">IP</option> \n";
 			}
                 
         
@@ -166,6 +180,7 @@ echo "</select> \n";
 ?>
 
 <p/>
+<!--  
 IP: 
 <input type="text" value="<? if($IP !="" ) { echo $IP; } else { echo "";}?>" name="IP" id="IP"></input>
 
@@ -175,7 +190,7 @@ PORT:
 <input type="text" value="<? if($PORT !="" ) { echo $PORT; } else { echo "";}?>" name="PORT" id="PORT"></input>
 
 <p/>
-
+-->
 STATIC TEXT PRE:
 <input type="text" size="64" value="<? if($STATIC_TEXT_PRE !="" ) { echo $STATIC_TEXT_PRE; } else { echo "";}?>" name="STATIC_TEXT_PRE" id="STATIC_TEXT_PRE"></input>
 
@@ -224,13 +239,13 @@ COLOR:
 <?
 
 //create an array of color here
-echo "<select name=\"COLOR\"> \n";
-                      echo "<option value=\"YELLOW\">YELLOW</option> \n";
-                      echo "<option value=\"GREEN\">GREEN</option> \n";
-                      echo "<option value=\"RAINBOW\">RAINBOW</option> \n";
+//echo "<select name=\"COLOR\"> \n";
+ //                     echo "<option value=\"YELLOW\">YELLOW</option> \n";
+  //                    echo "<option value=\"GREEN\">GREEN</option> \n";
+   //                   echo "<option value=\"RAINBOW\">RAINBOW</option> \n";
 
 
-echo "</select> \n";
+//echo "</select> \n";
 
 
 ?>
@@ -243,22 +258,19 @@ Separator between SongTitle & Song Artist:
 
 <p/>
 <input id="submit_button" name="submit" type="submit" class="buttons" value="Save Config">
-</form>
 
 
-<<<<<<< HEAD
 <p>To report a bug, please file it against the BetaBrite plugin project on Git: https://github.com/LightsOnHudson/FPP-Plugin-BetaBrite
 <?
  if(file_exists($pluginUpdateFile))
  {
- 	//echo "updating plugin included";
+ 	echo "updating plugin included";
 	include $pluginUpdateFile;
 }
 ?>
-=======
-<p>To report a bug, please file it against the BetaBrite plug-in project on Git: https://github.com/LightsOnHudson/FPP-Plugin-BetaBrite
+<p>To report a bug, please file it against <?php echo $gitURL;?>
+</form>
 
->>>>>>> origin/master
 </fieldset>
 </div>
 <br />
