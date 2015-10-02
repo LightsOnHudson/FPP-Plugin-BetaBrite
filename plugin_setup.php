@@ -56,13 +56,13 @@ if(isset($_POST['submit']))
 	WriteSettingToFile("STATIC_TEXT_PRE",urlencode($STATIC_TEXT_PRE),$pluginName);
 	WriteSettingToFile("STATIC_TEXT_POST",urlencode($STATIC_TEXT_POST),$pluginName);
 	WriteSettingToFile("ENABLED",$ENABLED,$pluginName);
-	WriteSettingToFile("STATION_ID",urlencode($STATION_ID),$pluginName);
+	//WriteSettingToFile("STATION_ID",urlencode($STATION_ID),$pluginName);
 	WriteSettingToFile("SEPARATOR",urlencode($SEPARATOR),$pluginName);
 
 } else {
 
 	
-	$STATION_ID = $pluginSettings['STATION_ID'];
+	//$STATION_ID = $pluginSettings['STATION_ID'];
 	$DEVICE = $pluginSettings['DEVICE'];
 	$DEVICE_CONNECTION_TYPE = $pluginSettings['DEVICE_CONNECTION_TYPE'];
 	$IP = $pluginSettings['IP'];
@@ -124,12 +124,13 @@ if($ENABLED == "on" || $ENABLED == 1) {
 echo "<p/> \n";
 
 ?>
+<!--  
 Manually Set Station ID<br>
 <p><label for="STATION_ID">Station ID:</label>
 <input type="text" value="<? if($STATION_ID !="" ) { echo $STATION_ID; } else { echo "";};?>" name="STATION_ID" id="STATION_ID"></input>
 (Expected format: up to 8 characters)
 </p>
-
+-->
 <?
 
 echo "Connection type: \n";
@@ -235,7 +236,9 @@ echo "</select> \n";
 ?>
 -->
 <p/>
+<!--  
 COLOR:
+-->
 <?
 
 //create an array of color here
@@ -261,10 +264,12 @@ Separator between SongTitle & Song Artist:
 
 
 <p>To report a bug, please file it against the BetaBrite plugin project on Git: https://github.com/LightsOnHudson/FPP-Plugin-BetaBrite
+
+<p>
 <?
  if(file_exists($pluginUpdateFile))
  {
- 	echo "updating plugin included";
+ 	//echo "updating plugin included";
 	include $pluginUpdateFile;
 }
 ?>
