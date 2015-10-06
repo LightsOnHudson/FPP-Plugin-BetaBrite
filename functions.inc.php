@@ -93,7 +93,10 @@ if (file_exists($pluginConfigFile))
         //# Modify the runlist.
         $CMD .= "$INIT" . "$WRITE_SPEC" . "\x2eSUA" .  "$EOT";
         
-        exec('nohup /usr/bin/php /home/fpp/media/plugins/BetaBrite/BBOut.php '.$CMD.' > nohup.out & > /dev/null');
+        $execCMD = "nohup /usr/bin/php /home/fpp/media/plugins/BetaBrite/BBOut.php ".$CMD." > nohup.out & > /dev/null";
+        
+        logEntry("EXEC CMD: ".$execCMD);
+        exec($execCMD);
         
         //# Close filehandle.
         //close (BETABRITE);
