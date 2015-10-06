@@ -4,11 +4,23 @@ function single_line_scroll ($combined, $scroller_color){
 
 
        include 'config/config.inc';
+	include_once "/opt/fpp/www/common.php";
 // Let's start the class
 
 logEntry("inside SINGLE LINE SCROLL");
 $SERIAL_DEVICE="/dev/ttyUSB0";
 logEntry("SERIAL DEVICE: ".$SERIAL_DEVICE);
+	$STATIC_TEXT_PRE = $pluginSettings['STATIC_TEXT_PRE'];
+	$STATIC_TEXT_POST = $pluginSettings['STATIC_TEXT_POST'];
+	$ENABLED = $pluginSettings['ENABLED'];
+	$LOOPTIME = $pluginSettings['LOOPTIME'];
+	$SEPARATOR = $pluginSettings['SEPARATOR'];
+
+logEntry(“Static Text pre: “.	$STATIC_TEXT_PRE);
+logEntry(“Static Text post: “.	$STATIC_TEXT_POST);
+logEntry(“SEPARATOR: “.	$SEPARATOR);
+
+
 
 $serial = new phpSerial;
 $serial->deviceSet($SERIAL_DEVICE);
