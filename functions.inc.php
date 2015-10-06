@@ -14,6 +14,8 @@ logEntry("SERIAL DEVICE: ".$SERIAL_DEVICE);
 $pluginName = "BetaBrite";
 
 $pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
+
+logEntry("plugin config file: ".$pluginConfigFile);
 if (file_exists($pluginConfigFile))
 	$pluginSettings = parse_ini_file($pluginConfigFile);
 
