@@ -40,9 +40,9 @@ if (file_exists($pluginConfigFile))
 	}
 
 
-$serial = new phpSerial;
-$serial->deviceSet($SERIAL_DEVICE);
-$serial->deviceOpen();
+//$serial = new phpSerial;
+//$serial->deviceSet($SERIAL_DEVICE);
+//$serial->deviceOpen();
 //      # =-=-= Start of character counting =-=-=
 //      # Added to the end of the message will be blank characters representing the length
 //      # of the display. This is so we can calculate how long it will take the message
@@ -82,16 +82,24 @@ $serial->deviceOpen();
 
 
         //# Send the message to the sign.
-        $serial->sendMessage($INIT . "AA" . $DPOS . $ROTATE . $scroller_color . $combined .  $EOT);
-        $serial->sendMessage("$INIT" . "AA" . "$DPOS" . "$ROTATE" . "$scroller_color" . "$combined" .  "$EOT");
-        //# Modify the runlist.
-        $serial->sendMessage("$INIT" . "$WRITE_SPEC" . "\x2eSUA" .  "$EOT");
+        //$serial->sendMessage($INIT . "AA" . $DPOS . $ROTATE . $scroller_color . $combined .  $EOT);
+        //$serial->sendMessage("$INIT" . "AA" . "$DPOS" . "$ROTATE" . "$scroller_color" . "$combined" .  "$EOT");
+        ///# Modify the runlist.
+       // $serial->sendMessage("$INIT" . "$WRITE_SPEC" . "\x2eSUA" .  "$EOT");
 
+        //# Send the message to the sign.
+       $CMD = $INIT . "AA" . $DPOS . $ROTATE . $scroller_color . $combined .  $EOT;
+       $CMD .= "$INIT" . "AA" . "$DPOS" . "$ROTATE" . "$scroller_color" . "$combined" .  "$EOT";
+        //# Modify the runlist.
+        $CMD .= "$INIT" . "$WRITE_SPEC" . "\x2eSUA" .  "$EOT";
+        
+        exec('nohup /usr/bin/php /home/fpp/media/plugins/BetaBrite/BBOut.php '.$CMD.' > nohup.out & > /dev/null');
+        
         //# Close filehandle.
         //close (BETABRITE);
         sleep(1);
-        logEntry("RETURN DATA: ".hex_dump($serial->readPort()));
-        $serial->deviceClose();
+        //logEntry("RETURN DATA: ".hex_dump($serial->readPort()));
+      //  $serial->deviceClose();
 
         //# Wait for message to scroll off before returning.
         sleep($delay);
