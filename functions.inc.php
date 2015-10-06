@@ -10,16 +10,19 @@ function single_line_scroll ($combined, $scroller_color){
 logEntry("inside SINGLE LINE SCROLL");
 $SERIAL_DEVICE="/dev/ttyUSB0";
 logEntry("SERIAL DEVICE: ".$SERIAL_DEVICE);
-	$STATIC_TEXT_PRE = $pluginSettings['STATIC_TEXT_PRE'];
-	$STATIC_TEXT_POST = $pluginSettings['STATIC_TEXT_POST'];
+	$STATIC_TEXT_PRE = urldecode($pluginSettings['STATIC_TEXT_PRE']);
+	$STATIC_TEXT_POST = urldecode($pluginSettings['STATIC_TEXT_POST']);
 	$ENABLED = $pluginSettings['ENABLED'];
 	$LOOPTIME = $pluginSettings['LOOPTIME'];
-	$SEPARATOR = $pluginSettings['SEPARATOR'];
+	$SEPARATOR = urldecode($pluginSettings['SEPARATOR']);
 
-logEntry(“Static Text pre: “.	$STATIC_TEXT_PRE);
-logEntry(“Static Text post: “.	$STATIC_TEXT_POST);
-logEntry(“SEPARATOR: “.	$SEPARATOR);
-
+	if($STATIC_TEXT_PRE != "") {
+		$combined = $STATIC_TEXT_PRE. " ".$SEPARATOR." ".$combined;
+	}
+	
+	if($STATIC_TEXT_POST != "") {
+		$combined = $combined ." ".$SEPARATOR." ".$STATIC_TEXT_POST;
+	}
 
 
 $serial = new phpSerial;
