@@ -92,8 +92,9 @@ if (file_exists($pluginConfigFile))
        $CMD .= "$INIT" . "AA" . "$DPOS" . "$ROTATE" . "$scroller_color" . "$combined" .  "$EOT";
         //# Modify the runlist.
         $CMD .= "$INIT" . "$WRITE_SPEC" . "\x2eSUA" .  "$EOT";
+        //exec("php-cgi ./nextbus-route_stop_predictions.php route=" . $route['route_id'] . " 2>/dev/null >&- < &- >/dev/null &");
         
-        $execCMD = "nohup /usr/bin/php /home/fpp/media/plugins/BetaBrite/BBOut.php ".$CMD." > nohup.out & > /dev/null";
+        $execCMD = "nohup /home/fpp/media/plugins/BetaBrite/BBOut.php ".$CMD." 2>/dev/null >&- < &- >/dev/null &";
         
         logEntry("EXEC CMD: ".$execCMD);
         exec($execCMD);
