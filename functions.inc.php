@@ -13,7 +13,8 @@ $SERIAL_DEVICE="/dev/ttyUSB0";
 logEntry("SERIAL DEVICE: ".$SERIAL_DEVICE);
 $pluginName = "BetaBrite";
 
-$pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
+//$pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
+$pluginConfigFile = "/home/fpp/media/config" . "/plugin." .$pluginName;
 
 logEntry("plugin config file: ".$pluginConfigFile);
 if (file_exists($pluginConfigFile))
