@@ -10,6 +10,12 @@ function single_line_scroll ($combined, $scroller_color){
 logEntry("inside SINGLE LINE SCROLL");
 $SERIAL_DEVICE="/dev/ttyUSB0";
 logEntry("SERIAL DEVICE: ".$SERIAL_DEVICE);
+$pluginName = "BetaBrite";
+
+$pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
+if (file_exists($pluginConfigFile))
+	$pluginSettings = parse_ini_file($pluginConfigFile);
+
 	$STATIC_TEXT_PRE = urldecode($pluginSettings['STATIC_TEXT_PRE']);
 	$STATIC_TEXT_POST = urldecode($pluginSettings['STATIC_TEXT_POST']);
 	$ENABLED = $pluginSettings['ENABLED'];
