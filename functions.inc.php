@@ -6,15 +6,16 @@ function single_line_scroll ($combined, $scroller_color){
        include 'config/config.inc';
 include_once '/opt/fpp/www/config.php';
 include_once '/opt/fpp/www/common.php';
+global $settings, $pluginName;
 // Let's start the class
 
 logEntry("inside SINGLE LINE SCROLL");
 $SERIAL_DEVICE="/dev/ttyUSB0";
 logEntry("SERIAL DEVICE: ".$SERIAL_DEVICE);
-$pluginName = "BetaBrite";
+//$pluginName = "BetaBrite";
 
-//$pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
-$pluginConfigFile = "/home/fpp/media/config" . "/plugin." .$pluginName;
+$pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
+//$pluginConfigFile = "/home/fpp/media/config" . "/plugin." .$pluginName;
 
 logEntry("plugin config file: ".$pluginConfigFile);
 if (file_exists($pluginConfigFile))
