@@ -22,6 +22,10 @@ if (file_exists($pluginConfigFile))
 	$ENABLED = $pluginSettings['ENABLED'];
 	$LOOPTIME = $pluginSettings['LOOPTIME'];
 	$SEPARATOR = urldecode($pluginSettings['SEPARATOR']);
+	
+	logEntry("STATIC PRE: ".$STATIC_TEXT_PRE);
+	logEntry("STATIC POST: ".$STATIC_TEXT_POST);
+	
 
 	if($STATIC_TEXT_PRE != "") {
 		$combined = $STATIC_TEXT_PRE. " ".$SEPARATOR." ".$combined;
