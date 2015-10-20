@@ -1,5 +1,44 @@
 <?php
 
+
+//fork a non blocking fppd process
+
+function fork($argv) {
+	global $DEBUG;
+	
+	$safe_arg = escapeshellarg($argv[4]);
+	//$safe_arg["arg_2"] = escapeshellarg($arg_2);
+	$pid = pcntl_fork();
+	 
+	if ( $pid == -1 ) {
+		// Fork failed
+		if($DEBUG)
+		logEntry("fork failed");
+	
+		exit(1);
+	} else if ( $pid ) {
+		// We are the parent
+		if($DEBUG) {
+		logEntry("------------");
+		logEntry("fork parent");
+		logEntry("------------");
+		}
+		return "Parent";
+	
+		// Can no longer use $db because it will be closed by the child
+		// Instead, make a new MySQL connection for ourselves to work with
+	} else {
+		if($DEBUG){
+		logEntry("------------");
+		logEntry("fork child");
+		logEntry("------------");
+		}
+		//logEntry("sleeping 5 seconds, processing, thensleeping agin");
+		
+		processCallback($argv);
+		return "Child";
+}
+}
 //update plugin
 
 function updatePluginFromGitHub($gitURL, $branch="master", $pluginName) {

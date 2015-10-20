@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$pluginName ="BetaBrite";
+$pluginName ="fork";
 
 
 $skipJSsettings = 1;
@@ -17,8 +17,11 @@ include 'php_serial.class.php';
 //$DEBUG=true;
 $logFile = $settings['logDirectory']."/".$pluginName.".log";
 
+echo "logfile: ".$logFile."\n";
 
-sendLineMessage("test");
+echo "argv: ".$argv."\n";
+
+logEntry(" fork argv: ".$argv);
 
 ?>
 
