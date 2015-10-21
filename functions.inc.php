@@ -3,21 +3,48 @@
 function single_line_scroll ($combined, $scroller_color){
 
 
-//include 'config/config.inc';
-//include_once '/opt/fpp/www/config.php';
-//include_once '/opt/fpp/www/common.php';
-include 'php_serial.class.php';
-
 global $settings, $pluginName, $DEBUG;
+
+include_once 'php_serial.class.php';
+
 // Let's start the class
 
 if($DEBUG)
 	logEntry("DEBUG: inside SINGLE LINE SCROLL");
 
 
-
-
 $pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
+//
+//
+//config inc
+$default_color="\x1c\x32"; //     # Green. Codes in sub start_up
+$delay_per_char=.12; 
+$sign_type="Z";    //     # Z=all signs ( See protocol doc if you have more than one sign on network
+$sign_address="00"; //    # 00=broadcast, 01=sign 01, 02=sign 02, etc
+
+//        # Set our variables
+        $NUL            = "\0\0\0\0\0\0"; //      # Send 6 nulls for wake up sign and set baud
+        $SOH            = "\x01";          //     # Start of header - NEVER CHANGES
+        $TYPE           = "$sign_type";     //    # Z = All signs. See Protocol doc for more info
+        $SIGN_ADDR      = "$sign_address";   //   # 00 = broadcast, 01 = sign address 1, etc
+        $STX            = "\x02";             //  # Start of Text character - NEVER CHANGES
+        $EOT            = "\004";             //  # End of transmission
+
+       // # All above combined to make life easier
+        $INIT="$NUL$SOH$TYPE$SIGN_ADDR$STX";
+
+        $WRITE          ="A";             //      # Write TEXT file
+        $WRITE_SPEC     ="E";              //     # Write SPECIAL FUNCTION file
+        $WRITE_DOT      ="I"; //# Write DOT file
+
+        $CALL_DOT       ="\x14"; //# Call dot file. Must be followed by DOTS PICTURE File label.
+
+
+        $DPOS           ="\x1b\x20";  //          # Set for BetaBrite one line sign
+        $ROTATE         ="\x61";       //         # Message travels right to left.
+
+        $FONT1          = "\x1a\x31"; //# Five high standard
+        $FONT2          = "\x1a\x33"; //# seven high standard
 
 if($DEBUG)
 	logEntry("DEBUG: plugin config file: ".$pluginConfigFile);
@@ -40,6 +67,7 @@ if (file_exists($pluginConfigFile))
 	if($DEBUG){
 		logEntry("DEBUG: STATIC PRE: ".$STATIC_TEXT_PRE);
 		logEntry("DEBUG: STATIC POST: ".$STATIC_TEXT_POST);
+		logEntry("DEBUG: SEPARATOR: ".$SEPARATOR);
 	}
 
 	if($STATIC_TEXT_PRE != "") {
@@ -82,9 +110,10 @@ if (file_exists($pluginConfigFile))
 
         if($DEBUG)
         logEntry("DEBUG: EXEC CMD: ".$CMD);
-       // exec($execCMD);//$DEVICE = ReadSettingFromFile("DEVICE",$pluginName);
+     
 
-
+	if($DEBUG)
+		logEntry("Device_connection_type: ".$DEVICE_CONNECTION_TYPE);
 
 
 switch($DEVICE_CONNECTION_TYPE) {
@@ -95,11 +124,24 @@ switch($DEVICE_CONNECTION_TYPE) {
 		logEntry("SERIAL DEVICE: ".$SERIAL_DEVICE);
         $serial = new phpSerial;
 
-        $serial->deviceSet($SERIAL_DEVICE);
-        $serial->confBaudRate($PROJECTOR_BAUD);
-        $serial->confParity($PROJECTOR_PARITY);
-        $serial->confCharacterLength($PROJECTOR_CHAR_BITS);
-        $serial->confStopBits($PROJECTOR_STOP_BITS);
+       $BAUD = "9600";
+	$PARITY="none";
+	$CHAR_BITS="8";
+	$STOP_BITS="1";
+
+	if($DEBUG) {
+		logEntry("DEBUG: BAUD: ".$BAUD);
+		logEntry("DEBUG: CHAR BITS: ".$CHAR_BITS);
+		logEntry("DEBUG: STOP BITS: ".$STOP_BITS);
+		logEntry("DEBUG: PARITY: ".$PARITY);
+
+	}
+ 
+	$serial->deviceSet($SERIAL_DEVICE);
+        $serial->confBaudRate($BAUD);
+        $serial->confParity($PARITY);
+        $serial->confCharacterLength($CHAR_BITS);
+        $serial->confStopBits($STOP_BITS);
         $serial->deviceOpen();
 	
 		
@@ -108,15 +150,7 @@ switch($DEVICE_CONNECTION_TYPE) {
 		logEntry("RETURN DATA: ".hex_dump($serial->readPort()));
 		$serial->deviceClose();
 		
-        
-        //# Close filehandle.
-        //close (BETABRITE);
-       // sleep(1);
-        //logEntry("RETURN DATA: ".hex_dump($serial->readPort()));
-      //  $serial->deviceClose();
 
-        //# Wait for message to scroll off before returning.
-      //  sleep($delay);
         exit(0);
         break;
         

@@ -1,12 +1,5 @@
 <?php
 
-$debug="0";
-
-$SERIAL_DEVICE="/dev/ttyUSB0";
-$TITLE="LED Sign";
-# These can stay unchanged
-
-
 $cfgServer="mss1";
 $cfgPort="3001";
 $cfgTimeOut=10;
