@@ -4,6 +4,7 @@
 
 $pluginName = "BetaBrite";
 include_once "functions.inc.php";
+include_once "BetaBriteFunctions.inc.php";
 include_once "commonFunctions.inc.php";
 include "config/config.inc";
 
@@ -69,11 +70,11 @@ if(isset($_POST['submit']))
 	$PORT = $pluginSettings['PORT'];
 	$LOOPMESSAGE = $pluginSettings['LOOPMESSAGE'];
 	$COLOR = $pluginSettings['COLOR'];
-	$STATIC_TEXT_PRE = $pluginSettings['STATIC_TEXT_PRE'];
-	$STATIC_TEXT_POST = $pluginSettings['STATIC_TEXT_POST'];
+	$STATIC_TEXT_PRE = urldecode($pluginSettings['STATIC_TEXT_PRE']);
+	$STATIC_TEXT_POST = urldecode($pluginSettings['STATIC_TEXT_POST']);
 	$ENABLED = $pluginSettings['ENABLED'];
 	$LOOPTIME = $pluginSettings['LOOPTIME'];
-	$SEPARATOR = $pluginSettings['SEPARATOR'];
+	$SEPARATOR = urldecode($pluginSettings['SEPARATOR']);
 	
 	
 }
