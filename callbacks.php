@@ -3,28 +3,24 @@
 error_reporting(0);
 
 $pluginName ="BetaBrite";
-//$DEBUG=true;
+
 
 $skipJSsettings = 1;
 include_once("/opt/fpp/www/config.php");
-
+include("config/config.inc");
 include_once("/opt/fpp/www/common.php");
 include_once("functions.inc.php");
 include_once("commonFunctions.inc.php");
-
+include_once("BetaBriteFunctions.inc.php");
+include 'php_serial.class.php';
 
 $ENABLED="";
 
-$pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
-
-if (file_exists($pluginConfigFile))
-	$pluginSettings = parse_ini_file($pluginConfigFile);
-	
-$ENABLED = urldecode($pluginSettings['ENABLED']);
+$ENABLED = trim(urldecode(ReadSettingFromFile("ENABLED",$pluginName)));
 
 //arg0 is  the program
 //arg1 is the first argument in the registration this will be --list
-
+//$DEBUG=true;
 $logFile = $settings['logDirectory']."/".$pluginName.".log";
 //$logFile = $logDirectory."/logs/betabrite.log";
 //echo "Enabled: ".$ENABLED."<br/> \n";
@@ -35,10 +31,9 @@ if($ENABLED != "on" && $ENABLED != "1") {
 	
 	exit(0);
 }
-$callbackRegisters = "media\n";
+$callbackRegisters = "media,plugin\n";
 $myPid = getmypid();
 //var_dump($argv);
-
 
 $FPPD_COMMAND = $argv[1];
 
@@ -52,17 +47,12 @@ if($FPPD_COMMAND == "--list") {
 }
 
 if($FPPD_COMMAND == "--type") {
-		if($DEBUG)
-			logEntry("DEBUG: type callback requested");
+			logEntry("type callback requested");
 			//we got a register request message from the daemon
-		$forkResult = fork($argv);
-		if($DEBUG)
-		logEntry("DEBUG: Fork Result: ".$forkResult);
-		exit(0); 
-		//	processCallback($argv);	
-} else {
+			processCallback($argv);	
+			exit(0);
+}
 
 			logEntry($argv[0]." called with no parameteres");
 			exit(0);
-}
 ?>

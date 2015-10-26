@@ -3,80 +3,27 @@
 function single_line_scroll ($combined, $scroller_color){
 
 
-global $settings, $pluginName, $DEBUG;
-
-include_once 'php_serial.class.php';
-
+       include 'config/config.inc';
 // Let's start the class
 
-if($DEBUG)
-	logEntry("DEBUG: inside SINGLE LINE SCROLL");
+logEntry("inside SINGLE LINE SCROLL");
+$SERIAL_DEVICE="/dev/ttyUSB0";
+logEntry("SERIAL DEVICE: ".$SERIAL_DEVICE);
 
+$serial = new phpSerial;
+$serial->deviceSet($SERIAL_DEVICE);
+$serial->deviceOpen();
+//      # =-=-= Start of character counting =-=-=
+//      # Added to the end of the message will be blank characters representing the length
+//      # of the display. This is so we can calculate how long it will take the message
+//      # to completely scroll off the end of the sign.
+//      # To calulate it correctly, the blanks have to be actual characters, which will
+//      #  be changed to blanks after it creates $combined2.
 
-$pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
-//
-//
-//config inc
-$default_color="\x1c\x32"; //     # Green. Codes in sub start_up
-$delay_per_char=.12; 
-$sign_type="Z";    //     # Z=all signs ( See protocol doc if you have more than one sign on network
-$sign_address="00"; //    # 00=broadcast, 01=sign 01, 02=sign 02, etc
+//        $serial->sendMessage("$INIT" . "$WRITE_SPEC" . "\x24" . "AAU00FFFFFE" . "UDU07114000" . "DDU07114000" . "$EOT");
+ //       $serial->sendMessage("$INIT" . "$WRITE_DOT" . "U" . "0711" . "00000000000\r00000200000\r00002220000\r00022222000\r00222222200\r02222222220\r00000000000\r" . "$EOT");
 
-//        # Set our variables
-        $NUL            = "\0\0\0\0\0\0"; //      # Send 6 nulls for wake up sign and set baud
-        $SOH            = "\x01";          //     # Start of header - NEVER CHANGES
-        $TYPE           = "$sign_type";     //    # Z = All signs. See Protocol doc for more info
-        $SIGN_ADDR      = "$sign_address";   //   # 00 = broadcast, 01 = sign address 1, etc
-        $STX            = "\x02";             //  # Start of Text character - NEVER CHANGES
-        $EOT            = "\004";             //  # End of transmission
-
-       // # All above combined to make life easier
-        $INIT="$NUL$SOH$TYPE$SIGN_ADDR$STX";
-
-        $WRITE          ="A";             //      # Write TEXT file
-        $WRITE_SPEC     ="E";              //     # Write SPECIAL FUNCTION file
-        $WRITE_DOT      ="I"; //# Write DOT file
-
-        $CALL_DOT       ="\x14"; //# Call dot file. Must be followed by DOTS PICTURE File label.
-
-
-        $DPOS           ="\x1b\x20";  //          # Set for BetaBrite one line sign
-        $ROTATE         ="\x61";       //         # Message travels right to left.
-
-        $FONT1          = "\x1a\x31"; //# Five high standard
-        $FONT2          = "\x1a\x33"; //# seven high standard
-
-if($DEBUG)
-	logEntry("DEBUG: plugin config file: ".$pluginConfigFile);
-
-if (file_exists($pluginConfigFile))
-	$pluginSettings = parse_ini_file($pluginConfigFile);
-
-	$STATIC_TEXT_PRE = urldecode($pluginSettings['STATIC_TEXT_PRE']);
-	$STATIC_TEXT_POST = urldecode($pluginSettings['STATIC_TEXT_POST']);
-	$ENABLED = $pluginSettings['ENABLED'];
-	$LOOPTIME = $pluginSettings['LOOPTIME'];
-	$SEPARATOR = urldecode($pluginSettings['SEPARATOR']);
-	$DEVICE = $pluginSettings['DEVICE'];
-	
-	//$DEVICE_CONNECTION_TYPE = ReadSettingFromFile("DEVICE_CONNECTION_TYPE",$pluginName);
-	$DEVICE_CONNECTION_TYPE = $pluginSettings['DEVICE_CONNECTION_TYPE'];
-
-	$SERIAL_DEVICE="/dev/".$DEVICE;
-	
-	if($DEBUG){
-		logEntry("DEBUG: STATIC PRE: ".$STATIC_TEXT_PRE);
-		logEntry("DEBUG: STATIC POST: ".$STATIC_TEXT_POST);
-		logEntry("DEBUG: SEPARATOR: ".$SEPARATOR);
-	}
-
-	if($STATIC_TEXT_PRE != "") {
-		$combined = $STATIC_TEXT_PRE. " ".$SEPARATOR." ".$combined;
-	}
-	
-	if($STATIC_TEXT_POST != "") {
-		$combined = $combined ." ".$SEPARATOR." ".$STATIC_TEXT_POST;
-	}
+   //     $serial->sendMessage("$INIT" . "$WRITE_DOT" . "D" . "0711" . "00000000000\r01111111110\r00111111100\r00011111000\r00001110000\r00000100000\r00000000000\r" . "$EOT");
 
         //$end="XXXXXXXXXXXXXXXXX";
           $end="                 ";
@@ -100,69 +47,25 @@ if (file_exists($pluginConfigFile))
         # Create the delay
         $delay=($char_count*$delay_per_char);
 
-      
+        //echo "delay: ".$delay."\n";
+        //#=-=-= End of character counting =-=-=
+
 
         //# Send the message to the sign.
-       $CMD = $INIT . "AA" . $DPOS . $ROTATE . $scroller_color . $combined .  $EOT;
-       $CMD .= "$INIT" . "AA" . "$DPOS" . "$ROTATE" . "$scroller_color" . "$combined" .  "$EOT";
+        $serial->sendMessage($INIT . "AA" . $DPOS . $ROTATE . $scroller_color . $combined .  $EOT);
+        $serial->sendMessage("$INIT" . "AA" . "$DPOS" . "$ROTATE" . "$scroller_color" . "$combined" .  "$EOT");
         //# Modify the runlist.
-        $CMD .= "$INIT" . "$WRITE_SPEC" . "\x2eSUA" .  "$EOT";
+        $serial->sendMessage("$INIT" . "$WRITE_SPEC" . "\x2eSUA" .  "$EOT");
 
-        if($DEBUG)
-        logEntry("DEBUG: EXEC CMD: ".$CMD);
-     
+        //# Close filehandle.
+        //close (BETABRITE);
+        sleep(1);
+        logEntry("RETURN DATA: ".hex_dump($serial->readPort()));
+        $serial->deviceClose();
 
-	if($DEBUG)
-		logEntry("Device_connection_type: ".$DEVICE_CONNECTION_TYPE);
-
-
-switch($DEVICE_CONNECTION_TYPE) {
-
-	case "SERIAL":
-
-		logEntry("Sending SERIAL COMMAND");
-		logEntry("SERIAL DEVICE: ".$SERIAL_DEVICE);
-        $serial = new phpSerial;
-
-       $BAUD = "9600";
-	$PARITY="none";
-	$CHAR_BITS="8";
-	$STOP_BITS="1";
-
-	if($DEBUG) {
-		logEntry("DEBUG: BAUD: ".$BAUD);
-		logEntry("DEBUG: CHAR BITS: ".$CHAR_BITS);
-		logEntry("DEBUG: STOP BITS: ".$STOP_BITS);
-		logEntry("DEBUG: PARITY: ".$PARITY);
-
-	}
- 
-	$serial->deviceSet($SERIAL_DEVICE);
-        $serial->confBaudRate($BAUD);
-        $serial->confParity($PARITY);
-        $serial->confCharacterLength($CHAR_BITS);
-        $serial->confStopBits($STOP_BITS);
-        $serial->deviceOpen();
-	
-		
-		$serial->sendMessage("$CMD");
-		sleep(1);
-		logEntry("RETURN DATA: ".hex_dump($serial->readPort()));
-		$serial->deviceClose();
-		
-
-        exit(0);
-        break;
-        
-	case "IP":
-		
-		break;
-		
-	default:
-		break;
-}
-		
-	
+        //# Wait for message to scroll off before returning.
+        sleep($delay);
+	logEntry("Sent message??");
 }
 
 function ip_single_line_scroll ($fs, $combined, $scroller_color){
@@ -290,8 +193,8 @@ function processCallback($argv) {
 	
 	$SEPARATOR = urldecode(ReadSettingFromFile("SEPARATOR",$pluginName));
 
-	//if($DEBUG)
-		//print_r($argv);
+	if($DEBUG)
+		print_r($argv);
 	//argv0 = program
 
 	//argv2 should equal our registration // need to process all the rgistrations we may have, array??
@@ -299,10 +202,6 @@ function processCallback($argv) {
 	//argv4 should be json data
 
 	$registrationType = $argv[2];
-
-	if($DEBUG)
-	logEntry("registration type: ".$registrationType);
-	
 	$data =  $argv[4];
 
 	logEntry("PROCESSING CALLBACK");
@@ -337,7 +236,6 @@ function processCallback($argv) {
 				
 				
 					$messageToSend = $songTitle." ".$SEPARATOR." ".$songArtist;
-					if($DEBUG)
 					logEntry("MESSAGE to send: ".$messageToSend);
 					sendLineMessage($messageToSend,$clearMessage);
 
@@ -352,7 +250,6 @@ function processCallback($argv) {
 				
 				
 					$messageToSend = $songTitle." ".$SEPARATOR." ".$songArtist;
-					if($DEBUG)
 					logEntry("MESSAGE to send: ".$messageToSend);
 					sendLineMessage($messageToSend,$clearMessage);
 				
@@ -393,18 +290,48 @@ function logEntry($data) {
 
 function sendLineMessage($line,$clearMessage=FALSE) {
 
-	global $DEBUG;
-	if($DEBUG)
-	logEntry("inside Send Line message");
+	global $default_color,$errno, $errstr, $cfgTimeOut,$pluginName,$pluginDirectory;
 	
-	$scroller_color="\x1c\x31";
+	$STATION_ID = urldecode(ReadSettingFromFile("STATION_ID",$pluginName));
+	$DEVICE = ReadSettingFromFile("DEVICE",$pluginName);
+	$DEVICE_CONNECTION_TYPE = ReadSettingFromFile("DEVICE_CONNECTION_TYPE",$pluginName);
+	$IP = ReadSettingFromFile("IP",$pluginName);
+	$PORT = ReadSettingFromFile("PORT",$pluginName);
+	$LOOPMESSAGE = ReadSettingFromFile("LOOPMESSAGE",$pluginName);
+	$COLOR = ReadSettingFromFile("COLOR",$pluginName);
+	$STATIC_TEXT_PRE = urldecode(ReadSettingFromFile("STATIC_TEXT_PRE",$pluginName));
+	$STATIC_TEXT_POST = urldecode(ReadSettingFromFile("STATIC_TEXT_POST",$pluginName));
+	$ENABLED = ReadSettingFromFile("ENABLED",$pluginName);
+	$LOOPTIME = ReadSettingFromFile("LOOPTIME",$pluginName);
+	
+	//FORCE
+	$LOOPMESSAGE="YES";
 
-	if($DEBUG)
-		logEntry("Default scroller collor: ".$scroller_color);
-	single_line_scroll($line, $scroller_color);	
-	
-	if($DEBUG)
-	logEntry("Leaving SendLine Message");
+logEntry("STATION_ID: ".$STATION_ID);
+logEntry("DEVICE: ".$DEVICE);
+logEntry("DEVICE_CONNECTION_TYPE: ".$DEVICE_CONNECTION_TYPE);
+logEntry("IP: ".$IP);
+logEntry("PORT: ".$PORT);
+logEntry("LOOPMESSAGE: ".$LOOPMESSAGE);
+logEntry("COLOR: ".$COLOR);
+logEntry("LOOPTIME: ".$LOOPTIME);
+logEntry("STATIC_TEXT_PRE: ".$STATIC_TEXT_PRE);
+logEntry("STATIC_TEXT_POST: ".$STATIC_TEXT_POST);
+logEntry("ENABLED: ".$ENABLED);
+logEntry("LOOPTIME: ".$LOOPTIME);
+
+
+logEntry("-------");
+logEntry("Sending command");
+logEntry("message to send: ".$line);
+
+$BAUD_RATE=9600;
+$STOP_BITS="1";
+$CHAR_BITS="8";
+$PARITY="none";
+$scroller_color="\x1c\x31";
+
+single_line_scroll($line, $scroller_color);	
 }
 
 
