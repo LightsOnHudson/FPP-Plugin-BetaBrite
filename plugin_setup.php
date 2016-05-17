@@ -110,7 +110,7 @@ $LOOPMESSAGE="YES";
 <li>Configure your connection type, Serial, Static text you want to send in front of Artist and song and post text, loop time if you want looping and color</li>
 </ul>
 
-<form method="post" action="http://<? echo $_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT']?>/plugin.php?plugin=BetaBrite&page=plugin_setup.php">
+<form method="post" action="http://<? echo $_SERVER['SERVER_ADDR'].":".$_SERVER['SERVER_PORT']?>/plugin.php?plugin=BetaBrite&page=plugin_setup.php">
 <?php 
 echo "ENABLE PLUGIN: ";
 
