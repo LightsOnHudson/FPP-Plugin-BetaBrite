@@ -2,7 +2,8 @@
 <?
 error_reporting(0);
 
-$pluginName ="BetaBrite";
+//$pluginName ="BetaBrite";
+$pluginName = basename(dirname(__FILE__));  //pjd 7-10-2019   added per dkulp 
 $DEBUG=true;
 
 $skipJSsettings = 1;
@@ -49,7 +50,7 @@ $myPid = getmypid();
 
 
 
-       $BAUD = "9600";
+        $BAUD = "9600";
         $PARITY="none";
         $CHAR_BITS="8";
         $STOP_BITS="1";
