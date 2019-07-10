@@ -3,7 +3,8 @@
 //include_once "/opt/fpp/www/common.php";
 
 //$pluginName = "BetaBrite";
-$pluginName = "FPP-Plugin-BetaBrite";
+//$pluginName = "FPP-Plugin-BetaBrite";
+$pluginName = basename(dirname(__FILE__));  //pjd 7-10-2019   added per dkulp 
 include_once "functions.inc.php";
 include_once "BetaBriteFunctions.inc.php";
 include_once "commonFunctions.inc.php";
