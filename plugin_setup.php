@@ -8,7 +8,7 @@ $pluginName = basename(dirname(__FILE__));  //pjd 7-10-2019   added per dkulp
 include_once "functions.inc.php";
 include_once "BetaBriteFunctions.inc.php";
 include_once "commonFunctions.inc.php";
-include "config/config.inc";
+include "config.inc";                        //pjd 8-20-2019  removed config/ from beginning of line
 
 $pluginUpdateFile = $settings['pluginDirectory']."/".$pluginName."/"."pluginUpdate.inc";
 $logFile = $settings['logDirectory']."/".$pluginName.".log";
